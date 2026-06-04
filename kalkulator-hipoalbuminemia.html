@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albumin Correction Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #21262d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --warn: #f0883e;
+    --danger: #f85149;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --card: #1c2128;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  header {
+    margin-bottom: 32px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 2px 8px;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 28px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .formula-box span {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  label .unit {
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 400;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  input[type="number"].warn { border-color: var(--warn); }
+  input[type="number"].danger { border-color: var(--danger); }
+
+  .hint {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .result-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--accent2);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .result-unit {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .result-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  .result-note .highlight {
+    color: var(--warn);
+  }
+
+  .placeholder {
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .empty { display: flex; align-items: center; justify-content: center; }
+
+  button {
+    width: 100%;
+    background: var(--accent);
+    color: #0d1117;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: opacity 0.2s;
+  }
+
+  button:hover { opacity: 0.85; }
+
+  .reset {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    margin-top: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-transform: none;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 24px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <div class="tag">Clinical Tool</div>
+    <h1>Albumin Correction Calculator</h1>
+    <p class="subtitle">Hypoalbuminemia — IV albumin replacement dose estimation</p>
+  </header>
+
+  <div class="formula-box">
+    Dose (g) = <span>(3.5 − Albumin) × 0.8 × Body Weight</span>
+  </div>
+
+  <div class="field">
+    <label>Serum Albumin <span class="unit">g/dL</span></label>
+    <input type="number" id="albumin" placeholder="e.g. 2.1" step="0.1" min="0" max="5" oninput="updateInput(this); calculate()">
+    <div class="hint" id="albumin-hint"></div>
+  </div>
+
+  <div class="field">
+    <label>Body Weight <span class="unit">kg</span></label>
+    <input type="number" id="weight" placeholder="e.g. 60" step="0.5" min="1" max="300" oninput="calculate()">
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="result-card" id="result-card">
+    <div class="placeholder">Enter values above to calculate</div>
+  </div>
+
+  <button onclick="calculate()">Calculate</button>
+  <button class="reset" onclick="reset()">Reset</button>
+
+  <div class="footer">For clinical reference only — verify with institutional protocols</div>
+</div>
+
+<script>
+  function updateInput(el) {
+    const v = parseFloat(el.value);
+    const hint = document.getElementById('albumin-hint');
+    el.classList.remove('warn', 'danger');
+    if (!isNaN(v)) {
+      if (v >= 3.5) {
+        hint.textContent = '✓ Normal range — no correction needed';
+        hint.style.color = '#3fb950';
+      } else if (v >= 2.5) {
+        el.classList.add('warn');
+        hint.textContent = '⚠ Mild hypoalbuminemia';
+        hint.style.color = '#f0883e';
+      } else {
+        el.classList.add('danger');
+        hint.textContent = '⚠ Severe hypoalbuminemia';
+        hint.style.color = '#f85149';
+      }
+    } else {
+      hint.textContent = '';
+    }
+  }
+
+  function calculate() {
+    const albumin = parseFloat(document.getElementById('albumin').value);
+    const weight = parseFloat(document.getElementById('weight').value);
+    const card = document.getElementById('result-card');
+
+    if (isNaN(albumin) || isNaN(weight) || albumin >= 3.5) {
+      if (!isNaN(albumin) && albumin >= 3.5) {
+        card.innerHTML = `
+          <div class="result-label">Result</div>
+          <div class="result-value" style="color:#3fb950">—</div>
+          <div class="result-unit">No replacement indicated</div>
+          <div class="result-note">Serum albumin ≥ 3.5 g/dL — within normal range.</div>
+        `;
+      } else {
+        card.className = 'result-card empty';
+        card.innerHTML = '<div class="placeholder">Enter values above to calculate</div>';
+      }
+      return;
+    }
+
+    if (albumin < 0 || albumin > 5 || weight < 1) {
+      card.innerHTML = `<div class="placeholder" style="color:#f85149">Please enter valid values</div>`;
+      return;
+    }
+
+    card.className = 'result-card';
+    const dose = (3.5 - albumin) * 0.8 * weight;
+    const deficit = 3.5 - albumin;
+    const vials20 = Math.ceil(dose / 20); // 20% albumin: 50mL vial = 10g
+    const vials25 = Math.ceil(dose / 12.5); // 25% albumin: 50mL vial = 12.5g
+
+    let severity = deficit < 1 ? 'Mild' : deficit < 1.5 ? 'Moderate' : 'Severe';
+    let sevColor = deficit < 1 ? '#f0883e' : deficit < 1.5 ? '#f0883e' : '#f85149';
+
+    card.innerHTML = `
+      <div class="result-label">Replacement Dose</div>
+      <div class="result-value">${dose.toFixed(1)}</div>
+      <div class="result-unit">grams of albumin</div>
+      <div class="result-note">
+        Deficit: <span class="highlight">${deficit.toFixed(1)} g/dL</span> &nbsp;|&nbsp;
+        Severity: <span style="color:${sevColor}">${severity}</span><br><br>
+        Approx. vials needed:<br>
+        &bull; <b style="color:#58a6ff">20% albumin</b> (50 mL = 10 g): <b>${vials20} vials</b> (${(vials20*50).toFixed(0)} mL)<br>
+        &bull; <b style="color:#58a6ff">25% albumin</b> (50 mL = 12.5 g): <b>${vials25} vials</b> (${(vials25*50).toFixed(0)} mL)
+      </div>
+    `;
+  }
+
+  function reset() {
+    document.getElementById('albumin').value = '';
+    document.getElementById('weight').value = '';
+    document.getElementById('albumin-hint').textContent = '';
+    document.getElementById('albumin').classList.remove('warn', 'danger');
+    const card = document.getElementById('result-card');
+    card.className = 'result-card empty';
+    card.innerHTML = '<div class="placeholder">Enter values above to calculate</div>';
+  }
+</script>
+</body>
+</html>
