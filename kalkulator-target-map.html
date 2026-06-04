@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAP Calculator — Hypertensive Emergency</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --surface: #111720;
+    --border: #1e2d3d;
+    --accent: #e63946;
+    --accent-dim: rgba(230,57,70,0.15);
+    --warn: #f4a261;
+    --warn-dim: rgba(244,162,97,0.12);
+    --ok: #52b788;
+    --ok-dim: rgba(82,183,136,0.12);
+    --text: #cdd6e0;
+    --muted: #5a7a8a;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .header {
+    background: var(--accent);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-icon {
+    font-size: 18px;
+  }
+
+  .header h1 {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .header p {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 1px;
+    color: #fff;
+    font-family: var(--mono);
+  }
+
+  .body { padding: 24px; }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .field input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 600;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus {
+    border-color: var(--accent);
+  }
+
+  .field input::placeholder {
+    color: #2a3a4a;
+  }
+
+  .field .unit {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-top: 4px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* MAP display */
+  .map-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .map-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .map-formula {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: #2a4a5a;
+    margin-top: 4px;
+  }
+
+  .map-value {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .map-value.empty {
+    color: #2a3a4a;
+  }
+
+  .map-unit {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    align-self: flex-end;
+    padding-bottom: 6px;
+  }
+
+  /* Target block */
+  .target-block {
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .target-block.active {
+    background: var(--warn-dim);
+    border: 1px solid rgba(244,162,97,0.3);
+  }
+
+  .target-block.empty {
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+
+  .target-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .target-block.active .target-label { color: var(--warn); }
+  .target-block.empty .target-label { color: var(--muted); }
+
+  .target-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--sans);
+  }
+
+  .target-value {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .target-block.active .target-value { color: var(--warn); }
+  .target-block.empty .target-value { color: #2a3a4a; }
+
+  /* Delta block */
+  .delta-block {
+    background: var(--ok-dim);
+    border: 1px solid rgba(82,183,136,0.2);
+    border-radius: 3px;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .delta-block.hidden {
+    display: none;
+  }
+
+  .delta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ok);
+  }
+
+  .delta-value {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ok);
+  }
+
+  /* Note */
+  .note {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: rgba(230,57,70,0.06);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .note p {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .note strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* Severity badge */
+  .severity {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-top: 6px;
+  }
+
+  .severity.critical { background: var(--accent-dim); color: var(--accent); }
+  .severity.high { background: var(--warn-dim); color: var(--warn); }
+  .severity.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <span class="header-icon">⚠</span>
+    <div>
+      <h1>MAP Calculator</h1>
+      <p>Hypertensive Emergency — Target Reduction</p>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="input-row">
+      <div class="field">
+        <label>Systolic</label>
+        <input type="number" id="sbp" placeholder="180" min="60" max="300" inputmode="numeric">
+        <div class="unit">mmHg</div>
+      </div>
+      <div class="field">
+        <label>Diastolic</label>
+        <input type="number" id="dbp" placeholder="110" min="40" max="200" inputmode="numeric">
+        <div class="unit">mmHg</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Current MAP -->
+    <div class="map-block">
+      <div>
+        <div class="map-label">Current MAP</div>
+        <div class="map-formula">MAP = (SBP + 2×DBP) / 3</div>
+        <div id="severity-badge" class="severity hidden"></div>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:4px">
+        <div id="map-value" class="map-value empty">—</div>
+        <div class="map-unit">mmHg</div>
+      </div>
+    </div>
+
+    <!-- Target MAP -->
+    <div id="target-block" class="target-block empty">
+      <div>
+        <div class="target-label">Target MAP at 1 hr</div>
+        <div class="target-sub">↓ 25% from baseline</div>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:4px">
+        <div id="target-value" class="target-value">—</div>
+        <div class="map-unit">mmHg</div>
+      </div>
+    </div>
+
+    <!-- Delta -->
+    <div id="delta-block" class="delta-block hidden">
+      <div class="delta-label">Reduction required</div>
+      <div id="delta-value" class="delta-value"></div>
+    </div>
+
+    <!-- Note -->
+    <div class="note">
+      <p>
+        <strong>JNC / ESH guideline:</strong> In hypertensive emergency, reduce MAP by <strong>no more than 25%</strong> within the first hour. Avoid precipitous drops — further reduction to 160/100 mmHg (or MAP ~110 mmHg) over the next 2–6 hours if tolerated.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const sbpEl = document.getElementById('sbp');
+  const dbpEl = document.getElementById('dbp');
+  const mapValEl = document.getElementById('map-value');
+  const targetValEl = document.getElementById('target-value');
+  const targetBlock = document.getElementById('target-block');
+  const deltaBlock = document.getElementById('delta-block');
+  const deltaValEl = document.getElementById('delta-value');
+  const severityBadge = document.getElementById('severity-badge');
+
+  function calc() {
+    const sbp = parseFloat(sbpEl.value);
+    const dbp = parseFloat(dbpEl.value);
+
+    if (!isNaN(sbp) && !isNaN(dbp) && sbp > 0 && dbp > 0 && sbp > dbp) {
+      const map = (sbp + 2 * dbp) / 3;
+      const target = map * 0.75;
+      const delta = map - target;
+
+      mapValEl.textContent = map.toFixed(0);
+      mapValEl.classList.remove('empty');
+
+      targetValEl.textContent = target.toFixed(0);
+      targetBlock.classList.remove('empty');
+      targetBlock.classList.add('active');
+
+      deltaValEl.textContent = `↓ ${delta.toFixed(0)} mmHg`;
+      deltaBlock.classList.remove('hidden');
+
+      // Severity
+      if (map >= 150) {
+        severityBadge.textContent = 'CRITICAL';
+        severityBadge.className = 'severity critical';
+      } else if (map >= 130) {
+        severityBadge.textContent = 'HIGH';
+        severityBadge.className = 'severity high';
+      } else {
+        severityBadge.className = 'severity hidden';
+      }
+
+    } else {
+      mapValEl.textContent = '—';
+      mapValEl.classList.add('empty');
+      targetValEl.textContent = '—';
+      targetBlock.classList.add('empty');
+      targetBlock.classList.remove('active');
+      deltaBlock.classList.add('hidden');
+      severityBadge.className = 'severity hidden';
+    }
+  }
+
+  sbpEl.addEventListener('input', calc);
+  dbpEl.addEventListener('input', calc);
+</script>
+</body>
+</html>
