@@ -1,1 +1,442 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalium Correction Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --accent: #f78166;
+    --accent2: #ffa657;
+    --green: #3fb950;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --danger: #f85149;
+    --warn: #d29922;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(247,129,102,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(255,166,87,0.05) 0%, transparent 40%);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    animation: rise 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  @keyframes rise {
+    from { opacity:0; transform: translateY(20px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .header {
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(247,129,102,0.12);
+    border: 1px solid rgba(247,129,102,0.25);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  h1 span { color: var(--accent2); }
+
+  .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .body { padding: 28px 32px; }
+
+  .field { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    font-weight: 400;
+    padding: 14px 56px 14px 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  input[type="number"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(247,129,102,0.15);
+  }
+
+  input.warn { border-color: var(--warn); }
+  input.warn:focus { box-shadow: 0 0 0 3px rgba(210,153,34,0.15); }
+
+  .unit {
+    position: absolute;
+    right: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .formula-box .f-label { color: var(--accent); font-weight: 500; display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .formula-box .f-eq { color: var(--text); font-size: 13px; }
+
+  .btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: #0d1117;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    margin-bottom: 16px;
+  }
+
+  .btn:hover { background: #ff9580; box-shadow: 0 8px 24px rgba(247,129,102,0.3); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); box-shadow: none; }
+
+  .btn-reset {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-reset:hover { border-color: var(--muted); color: var(--text); }
+
+  .result {
+    display: none;
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    animation: fadeIn 0.3s ease both;
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+  .result.show { display: block; }
+
+  .result-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .result-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 40px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .result-value span { font-size: 18px; color: var(--muted); margin-left: 4px; }
+
+  .result-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .severity-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 16px 0;
+    overflow: hidden;
+  }
+
+  .severity-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.16,1,0.3,1), background 0.3s;
+  }
+
+  .notes {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .notes-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .notes-row:last-child { border-bottom: none; }
+  .notes-row .k { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; }
+  .notes-row .v { color: var(--text); font-weight: 600; }
+
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .tag-mild    { background: rgba(63,185,80,0.12);  color: var(--green);  border: 1px solid rgba(63,185,80,0.25); }
+  .tag-mod     { background: rgba(210,153,34,0.12); color: var(--warn);   border: 1px solid rgba(210,153,34,0.25); }
+  .tag-severe  { background: rgba(248,81,73,0.12);  color: var(--danger); border: 1px solid rgba(248,81,73,0.25); }
+
+  .error-msg {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--danger);
+    margin-top: 6px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="badge">Internal Medicine · Electrolytes</div>
+    <h1>Kalium <span>Correction</span></h1>
+    <p class="subtitle">Hypokalemia deficit calculator</p>
+  </div>
+
+  <div class="body">
+    <div class="formula-box">
+      <span class="f-label">Formula</span>
+      <span class="f-eq">(4.5 − K<sup>+</sup> lab) × 0.4 × Body Weight</span>
+    </div>
+
+    <div class="field">
+      <label>Serum K⁺ (Lab Result)</label>
+      <div class="input-wrap">
+        <input type="number" id="kalium" placeholder="0.00" step="0.1" min="0.1" max="4.4">
+        <span class="unit">mEq/L</span>
+      </div>
+      <div class="error-msg" id="err-k">Value must be between 0.1 – 4.4 mEq/L</div>
+    </div>
+
+    <div class="field">
+      <label>Body Weight</label>
+      <div class="input-wrap">
+        <input type="number" id="weight" placeholder="0" step="0.5" min="1" max="300">
+        <span class="unit">kg</span>
+      </div>
+      <div class="error-msg" id="err-w">Please enter a valid weight (1–300 kg)</div>
+    </div>
+
+    <button class="btn" onclick="calculate()">Calculate Deficit</button>
+    <button class="btn-reset" onclick="reset()">Reset</button>
+
+    <div class="result" id="result">
+      <div class="result-label">Kalium Deficit</div>
+      <div class="result-value" id="result-val">— <span>mEq</span></div>
+      <div class="result-sub" id="result-sub"></div>
+      <div class="severity-bar"><div class="severity-fill" id="sev-fill"></div></div>
+      <div class="notes" id="notes-box"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function calculate() {
+  const kInput = document.getElementById('kalium');
+  const wInput = document.getElementById('weight');
+  const errK   = document.getElementById('err-k');
+  const errW   = document.getElementById('err-w');
+
+  const k = parseFloat(kInput.value);
+  const w = parseFloat(wInput.value);
+  let valid = true;
+
+  // Validate
+  errK.classList.remove('show');
+  errW.classList.remove('show');
+  kInput.classList.remove('warn');
+  wInput.classList.remove('warn');
+
+  if (!kInput.value || isNaN(k) || k <= 0 || k >= 4.5) {
+    errK.classList.add('show');
+    kInput.classList.add('warn');
+    valid = false;
+  }
+  if (!wInput.value || isNaN(w) || w <= 0 || w > 300) {
+    errW.classList.add('show');
+    wInput.classList.add('warn');
+    valid = false;
+  }
+  if (!valid) return;
+
+  const deficit = (4.5 - k) * 0.4 * w;
+
+  // Severity
+  let sevTag, sevColor, sevPct, sevNote;
+  if (k >= 3.0) {
+    sevTag = '<span class="tag tag-mild">Mild</span>';
+    sevColor = '#3fb950'; sevPct = 30;
+    sevNote = 'Oral KCl supplementation preferred. Monitor and recheck in 24–48h.';
+  } else if (k >= 2.5) {
+    sevTag = '<span class="tag tag-mod">Moderate</span>';
+    sevColor = '#d29922'; sevPct = 65;
+    sevNote = 'IV KCl may be indicated. Max infusion rate: 10–20 mEq/h via peripheral. ECG monitoring advised.';
+  } else {
+    sevTag = '<span class="tag tag-severe">Severe</span>';
+    sevColor = '#f85149'; sevPct = 95;
+    sevNote = 'Urgent IV replacement. Central line preferred. Continuous ECG monitoring. ICU consideration.';
+  }
+
+  document.getElementById('result-val').innerHTML = `${deficit.toFixed(1)} <span>mEq</span>`;
+  document.getElementById('result-sub').textContent = `K⁺ ${k} mEq/L · BW ${w} kg`;
+
+  const fill = document.getElementById('sev-fill');
+  fill.style.background = sevColor;
+  fill.style.width = '0%';
+  setTimeout(() => fill.style.width = sevPct + '%', 50);
+
+  document.getElementById('notes-box').innerHTML = `
+    <div class="notes-row">
+      <span class="k">Severity</span>
+      <span class="v">${sevTag}</span>
+    </div>
+    <div class="notes-row">
+      <span class="k">Serum K⁺</span>
+      <span class="v">${k.toFixed(1)} mEq/L</span>
+    </div>
+    <div class="notes-row">
+      <span class="k">Target K⁺</span>
+      <span class="v">4.5 mEq/L</span>
+    </div>
+    <div class="notes-row">
+      <span class="k">Total Deficit</span>
+      <span class="v">${deficit.toFixed(1)} mEq</span>
+    </div>
+    <div class="notes-row" style="display:block; padding-top:10px; padding-bottom:4px;">
+      <span class="k" style="display:block; margin-bottom:6px;">Clinical Note</span>
+      <span style="font-size:11px; color:#8b949e; line-height:1.5;">${sevNote}</span>
+    </div>
+  `;
+
+  const res = document.getElementById('result');
+  res.classList.remove('show');
+  void res.offsetWidth;
+  res.classList.add('show');
+}
+
+function reset() {
+  document.getElementById('kalium').value = '';
+  document.getElementById('weight').value = '';
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('err-k').classList.remove('show');
+  document.getElementById('err-w').classList.remove('show');
+  document.getElementById('kalium').classList.remove('warn');
+  document.getElementById('weight').classList.remove('warn');
+}
+
+// Enter key support
+document.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+</script>
+</body>
+</html>
+
