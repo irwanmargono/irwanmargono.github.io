@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Pajak Penghasilan Dokter</title>
+<style>
+  :root{
+    --bg:#0f1411;
+    --panel:#171d19;
+    --line:#2a322c;
+    --accent:#7fd1ae;
+    --accent-dim:#3d5a4c;
+    --text:#e8ece9;
+    --muted:#93a39b;
+    --warn:#e0b15a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    padding:24px 16px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{margin-bottom:24px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);font-weight:600;margin-bottom:6px;
+  }
+  h1{font-size:26px;font-weight:700;letter-spacing:-0.01em;}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:18px;
+  }
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+  input[type=number]{
+    width:100%;background:#101512;border:1px solid var(--line);
+    color:var(--text);font-size:16px;padding:11px 12px;border-radius:9px;
+    font-family:inherit;
+  }
+  input[type=number]:focus{outline:none;border-color:var(--accent);}
+  select{
+    width:100%;background:#101512;border:1px solid var(--line);
+    color:var(--text);font-size:14px;padding:11px 12px;border-radius:9px;
+    font-family:inherit;cursor:pointer;
+  }
+  select:focus{outline:none;border-color:var(--accent);}
+  .field{margin-bottom:16px;}
+  .ptkp-desc{
+    font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5;
+    border-left:2px solid var(--accent-dim);padding-left:10px;
+  }
+
+  .toggle-row{
+    display:flex;align-items:center;justify-content:space-between;
+    background:#101512;border:1px solid var(--line);border-radius:9px;
+    padding:12px 14px;
+  }
+  .toggle-row .t-label{font-size:14px;font-weight:600;}
+  .toggle-row .t-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .switch{
+    position:relative;width:46px;height:26px;flex-shrink:0;margin-left:14px;
+  }
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{
+    position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
+    background:#2a322c;border-radius:999px;transition:.2s;
+  }
+  .slider:before{
+    content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;
+    background:#cdd6d1;border-radius:50%;transition:.2s;
+  }
+  .switch input:checked + .slider{background:var(--accent-dim);}
+  .switch input:checked + .slider:before{transform:translateX(20px);background:var(--accent);}
+
+  .btn{
+    width:100%;background:var(--accent);color:#0f1411;border:none;
+    font-size:15px;font-weight:700;padding:13px;border-radius:10px;
+    cursor:pointer;letter-spacing:.02em;transition:.15s;
+  }
+  .btn:hover{background:#93dcc0;}
+
+  .result{display:none;}
+  .result.show{display:block;}
+  .result-grid{display:grid;gap:10px;}
+  .result-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:12px 14px;background:#101512;border:1px solid var(--line);border-radius:9px;
+  }
+  .result-row .rl{font-size:13px;color:var(--muted);}
+  .result-row .rv{font-size:15px;font-weight:700;font-family:'Courier New',monospace;}
+  .result-row.highlight{border-color:var(--accent-dim);background:#142019;}
+  .result-row.highlight .rv{color:var(--accent);font-size:18px;}
+
+  .bracket-table{margin-top:14px;font-size:12.5px;}
+  .bracket-table table{width:100%;border-collapse:collapse;}
+  .bracket-table th,.bracket-table td{
+    text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);color:var(--muted);
+  }
+  .bracket-table th{font-weight:600;color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+  .bracket-table td.num{text-align:right;font-family:'Courier New',monospace;}
+  .bracket-table tr.active td{color:var(--text);}
+
+  footer{
+    margin-top:24px;padding:14px 16px;border-radius:10px;
+    background:#1a1d16;border:1px solid #3a3526;
+    font-size:12px;color:var(--warn);line-height:1.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Kalkulator Pajak</div>
+    <h1>Estimasi PPh 21 Penghasilan Dokter</h1>
+    <div class="sub">Berdasarkan tarif progresif PPh 21 (UU HPP) &amp; norma penghitungan neto (NPPN)</div>
+  </header>
+
+  <div class="card">
+    <div class="field">
+      <label for="bruto">Jumlah Penghasilan Bruto Setahun (Rp)</label>
+      <input type="number" id="bruto" placeholder="contoh: 600000000" min="0">
+    </div>
+
+    <div class="field">
+      <label for="ptkp">Status PTKP (Penghasilan Tidak Kena Pajak)</label>
+      <select id="ptkp" onchange="updatePtkpDesc()">
+        <option value="54000000" data-desc="Wajib Pajak Tidak Kawin tanpa tanggungan.">TK/0 — Tidak Kawin, 0 tanggungan</option>
+        <option value="58500000" data-desc="Wajib Pajak Tidak Kawin dengan 1 tanggungan (anak/anggota keluarga sedarah/semenda).">TK/1 — Tidak Kawin, 1 tanggungan</option>
+        <option value="63000000" data-desc="Wajib Pajak Tidak Kawin dengan 2 tanggungan.">TK/2 — Tidak Kawin, 2 tanggungan</option>
+        <option value="67500000" data-desc="Wajib Pajak Tidak Kawin dengan 3 tanggungan (maksimal tanggungan yang diakui).">TK/3 — Tidak Kawin, 3 tanggungan</option>
+        <option value="58500000" data-desc="Wajib Pajak Kawin tanpa tanggungan. Tambahan Rp4.500.000 dari PTKP dasar (Rp54.000.000).">K/0 — Kawin, 0 tanggungan</option>
+        <option value="63000000" data-desc="Wajib Pajak Kawin dengan 1 tanggungan.">K/1 — Kawin, 1 tanggungan</option>
+        <option value="67500000" data-desc="Wajib Pajak Kawin dengan 2 tanggungan.">K/2 — Kawin, 2 tanggungan</option>
+        <option value="72000000" data-desc="Wajib Pajak Kawin dengan 3 tanggungan (maksimal tanggungan yang diakui).">K/3 — Kawin, 3 tanggungan</option>
+        <option value="112500000" data-desc="Penghasilan suami dan istri digabung (NPWP gabung), istri tidak bekerja / tidak memiliki NPWP terpisah, tanpa tanggungan. PTKP = PTKP Wajib Pajak + PTKP status kawin + PTKP tambahan untuk istri (setara TK/0).">K/I/0 — Kawin + Penghasilan Istri Digabung, 0 tanggungan</option>
+        <option value="117000000" data-desc="Penghasilan digabung dengan istri, dengan 1 tanggungan.">K/I/1 — Kawin + Penghasilan Istri Digabung, 1 tanggungan</option>
+        <option value="121500000" data-desc="Penghasilan digabung dengan istri, dengan 2 tanggungan.">K/I/2 — Kawin + Penghasilan Istri Digabung, 2 tanggungan</option>
+        <option value="126000000" data-desc="Penghasilan digabung dengan istri, dengan 3 tanggungan (maksimal).">K/I/3 — Kawin + Penghasilan Istri Digabung, 3 tanggungan</option>
+      </select>
+      <div class="ptkp-desc" id="ptkpDesc"></div>
+    </div>
+
+    <div class="field">
+      <div class="toggle-row">
+        <div>
+          <div class="t-label">Gunakan Norma Penghitungan (NPPN 50%)</div>
+          <div class="t-sub">Penghasilan neto dihitung 50% dari bruto (untuk dokter praktik mandiri/profesi bebas)</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="nppn">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn" onclick="hitungPajak()">Hitung Pajak</button>
+  </div>
+
+  <div class="card result" id="resultCard">
+    <div class="result-grid">
+      <div class="result-row">
+        <span class="rl">Penghasilan Neto (setelah NPPN, jika dipilih)</span>
+        <span class="rv" id="rNeto">-</span>
+      </div>
+      <div class="result-row">
+        <span class="rl">PTKP yang digunakan</span>
+        <span class="rv" id="rPtkp">-</span>
+      </div>
+      <div class="result-row highlight">
+        <span class="rl">Penghasilan Kena Pajak (PKP)</span>
+        <span class="rv" id="rPkp">-</span>
+      </div>
+      <div class="result-row">
+        <span class="rl">Tarif Efektif (rata-rata)</span>
+        <span class="rv" id="rTarif">-</span>
+      </div>
+      <div class="result-row highlight">
+        <span class="rl">Total PPh 21 Terutang Setahun</span>
+        <span class="rv" id="rPajak">-</span>
+      </div>
+    </div>
+
+    <div class="bracket-table">
+      <table>
+        <thead>
+          <tr><th>Lapisan</th><th>Tarif</th><th class="num">Dasar Pengenaan</th><th class="num">Pajak</th></tr>
+        </thead>
+        <tbody id="bracketBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    Kalkulator ini disusun sebagai alat bantu estimasi dan bersifat informatif. Hasil perhitungan tidak menggantikan konsultasi dengan konsultan pajak atau perhitungan resmi melalui DJP Online. Mohon periksa kembali kewajiban pajak Anda secara saksama sebelum melakukan pelaporan.
+  </footer>
+</div>
+
+<script>
+function updatePtkpDesc(){
+  const sel = document.getElementById('ptkp');
+  const desc = sel.options[sel.selectedIndex].getAttribute('data-desc');
+  document.getElementById('ptkpDesc').textContent = desc;
+}
+updatePtkpDesc();
+
+function formatRp(n){
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+function hitungPajak(){
+  const brutoInput = parseFloat(document.getElementById('bruto').value);
+  if(!brutoInput || brutoInput <= 0){
+    alert('Mohon masukkan jumlah penghasilan bruto yang valid.');
+    return;
+  }
+  const ptkp = parseFloat(document.getElementById('ptkp').value);
+  const useNppn = document.getElementById('nppn').checked;
+
+  // Penghasilan neto
+  const neto = useNppn ? brutoInput * 0.5 : brutoInput;
+
+  // PKP
+  let pkp = Math.max(0, neto - ptkp);
+  // Pembulatan ke bawah ribuan penuh sesuai aturan PPh 21
+  pkp = Math.floor(pkp / 1000) * 1000;
+
+  // Lapisan tarif progresif UU HPP (berlaku sejak 2022)
+  const brackets = [
+    { limit: 60000000, rate: 0.05, label: "s/d Rp60.000.000" },
+    { limit: 250000000, rate: 0.15, label: "Rp60.000.000 – Rp250.000.000" },
+    { limit: 500000000, rate: 0.25, label: "Rp250.000.000 – Rp500.000.000" },
+    { limit: 5000000000, rate: 0.30, label: "Rp500.000.000 – Rp5.000.000.000" },
+    { limit: Infinity, rate: 0.35, label: "> Rp5.000.000.000" }
+  ];
+
+  let remaining = pkp;
+  let totalPajak = 0;
+  let rows = [];
+
+  for(const b of brackets){
+    if(remaining <= 0) break;
+    const portion = Math.min(remaining, b.limit);
+    const tax = portion * b.rate;
+    totalPajak += tax;
+    rows.push({label: b.label, rate: b.rate, portion: portion, tax: tax});
+    remaining -= portion;
+  }
+
+  const tarifEfektif = pkp > 0 ? (totalPajak / pkp * 100) : 0;
+  const tarifTertinggi = rows.length ? rows[rows.length-1].rate * 100 : 0;
+
+  document.getElementById('rNeto').textContent = formatRp(neto);
+  document.getElementById('rPtkp').textContent = formatRp(ptkp);
+  document.getElementById('rPkp').textContent = formatRp(pkp);
+  document.getElementById('rTarif').textContent =
+    `${tarifEfektif.toFixed(2)}% (rata-rata) / lapisan tertinggi ${tarifTertinggi}%`;
+  document.getElementById('rPajak').textContent = formatRp(totalPajak);
+
+  const tbody = document.getElementById('bracketBody');
+  tbody.innerHTML = '';
+  if(rows.length === 0){
+    tbody.innerHTML = '<tr><td colspan="4">PKP nol — tidak ada pajak terutang.</td></tr>';
+  } else {
+    rows.forEach(r=>{
+      tbody.innerHTML += `<tr class="active">
+        <td>${r.label}</td>
+        <td>${(r.rate*100)}%</td>
+        <td class="num">${formatRp(r.portion)}</td>
+        <td class="num">${formatRp(r.tax)}</td>
+      </tr>`;
+    });
+  }
+
+  document.getElementById('resultCard').classList.add('show');
+}
+</script>
+</body>
+</html>
