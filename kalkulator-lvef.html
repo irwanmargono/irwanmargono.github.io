@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVEF Calculator (Teichholz)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1115;
+    margin: 0;
+    padding: 20px 14px 60px;
+    color: #e6e8eb;
+  }
+  .card {
+    max-width: 420px;
+    margin: 0 auto;
+    background: #1a1d23;
+    border-radius: 14px;
+    padding: 22px;
+    border: 1px solid #262a33;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.4);
+  }
+  h1 {
+    font-size: 19px;
+    margin: 0 0 2px;
+    color: #f2f3f5;
+  }
+  .sub {
+    font-size: 13px;
+    color: #9aa1ab;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 14px;
+    color: #d6d9de;
+  }
+  input[type=number] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 1px solid #333844;
+    border-radius: 10px;
+    outline: none;
+    background: #12141a;
+    color: #f2f3f5;
+  }
+  input[type=number]::placeholder { color: #5c6270; }
+  input[type=number]:focus {
+    border-color: #3b82f6;
+  }
+  button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    background: #3b82f6;
+    border: none;
+    border-radius: 10px;
+  }
+  button:active { background: #2563eb; }
+  .result {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #12141a;
+    border: 1px solid #262a33;
+    display: none;
+  }
+  .result.show { display: block; }
+  .ef-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    color: #f8f9fa;
+  }
+  .ef-label {
+    font-size: 13px;
+    color: #9aa1ab;
+    margin: 2px 0 10px;
+  }
+  .category {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .cat-hfref { background: #3a1a1a; color: #f87171; }
+  .cat-hfmref { background: #3a2e12; color: #fbbf24; }
+  .cat-hfpef { background: #123a1e; color: #4ade80; }
+  .details {
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: #9aa1ab;
+    line-height: 1.6;
+  }
+  .details div { display: flex; justify-content: space-between; }
+  .details span:last-child { color: #e6e8eb; font-weight: 500; }
+  .warn {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #fbbf24;
+    background: #2a2410;
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: none;
+  }
+  .warn.show { display: block; }
+  .err {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #f87171;
+    display: none;
+  }
+  .err.show { display: block; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>LVEF Calculator</h1>
+  <div class="sub">Teichholz method (M-mode)</div>
+
+  <label for="lvidd">LVIDd — LV internal diameter, diastole (cm)</label>
+  <input type="number" id="lvidd" step="0.01" placeholder="e.g. 5.0" inputmode="decimal">
+
+  <label for="lvids">LVIDs — LV internal diameter, systole (cm)</label>
+  <input type="number" id="lvids" step="0.01" placeholder="e.g. 3.5" inputmode="decimal">
+
+  <button onclick="calculate()">Calculate LVEF</button>
+
+  <div class="err" id="err"></div>
+
+  <div class="result" id="result">
+    <p class="ef-value" id="efValue"></p>
+    <div class="ef-label">LVEF (Teichholz)</div>
+    <span class="category" id="category"></span>
+
+    <div class="details">
+      <div><span>EDV</span><span id="edv"></span></div>
+      <div><span>ESV</span><span id="esv"></span></div>
+      <div><span>Stroke Volume</span><span id="sv"></span></div>
+    </div>
+    <div class="warn" id="warn">⚠ Teichholz becomes less accurate with regional wall motion abnormalities or LV diameter &gt;7 cm. Consider Simpson's biplane method.</div>
+  </div>
+</div>
+
+<script>
+function teichholzVol(d) {
+  return (7.0 / (2.4 + d)) * Math.pow(d, 3);
+}
+
+function calculate() {
+  const dd = parseFloat(document.getElementById('lvidd').value);
+  const ds = parseFloat(document.getElementById('lvids').value);
+  const errEl = document.getElementById('err');
+  const resultEl = document.getElementById('result');
+
+  errEl.classList.remove('show');
+  resultEl.classList.remove('show');
+
+  if (isNaN(dd) || isNaN(ds)) {
+    errEl.textContent = 'Please enter both LVIDd and LVIDs.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (dd <= 0 || ds <= 0) {
+    errEl.textContent = 'Values must be greater than 0.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (ds >= dd) {
+    errEl.textContent = 'LVIDs should be smaller than LVIDd.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const edv = teichholzVol(dd);
+  const esv = teichholzVol(ds);
+  const sv = edv - esv;
+  const ef = (sv / edv) * 100;
+
+  document.getElementById('efValue').textContent = ef.toFixed(2) + '%';
+  document.getElementById('edv').textContent = edv.toFixed(1) + ' mL';
+  document.getElementById('esv').textContent = esv.toFixed(1) + ' mL';
+  document.getElementById('sv').textContent = sv.toFixed(1) + ' mL';
+
+  const catEl = document.getElementById('category');
+  catEl.className = 'category';
+  let catText;
+  if (ef < 40) {
+    catText = 'HFrEF (EF < 40%)';
+    catEl.classList.add('cat-hfref');
+  } else if (ef < 50) {
+    catText = 'HFmrEF (EF 40–49%)';
+    catEl.classList.add('cat-hfmref');
+  } else {
+    catText = 'Preserved EF — HFpEF range (EF ≥ 50%)';
+    catEl.classList.add('cat-hfpef');
+  }
+  catEl.textContent = catText;
+
+  const warnEl = document.getElementById('warn');
+  if (dd > 7 || ds > 7) {
+    warnEl.classList.add('show');
+  } else {
+    warnEl.classList.remove('show');
+  }
+
+  resultEl.classList.add('show');
+}
+</script>
+</body>
+</html>
