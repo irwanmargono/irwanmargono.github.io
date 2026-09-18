@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Kecepatan Syringe Pump — Obat Vasoaktif</title>
+<style>
+  :root{
+    --ink:#122b28;
+    --ink-soft:#3d5652;
+    --paper:#f4f7f6;
+    --panel:#ffffff;
+    --line:#d7e2df;
+    --accent:#0e6b5c;
+    --accent-deep:#0a4d43;
+    --warn:#b5472e;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+    --serif: "IBM Plex Serif", Georgia, serif;
+    --sans: "IBM Plex Sans", -apple-system, Segoe UI, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#e7f1ee; --ink-soft:#a9c2bd; --paper:#0d1917; --panel:#122622;
+      --line:#20403a; --accent:#3fcdae; --accent-deep:#7fe3cb; --warn:#ff8064;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#e7f1ee; --ink-soft:#a9c2bd; --paper:#0d1917; --panel:#122622;
+    --line:#20403a; --accent:#3fcdae; --accent-deep:#7fe3cb; --warn:#ff8064;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); line-height:1.45;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:640px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  header h1{
+    font-family:var(--serif); font-weight:600; font-size:1.5rem;
+    margin:0 0 6px; letter-spacing:-0.01em;
+  }
+  header p{margin:0; color:var(--ink-soft); font-size:0.92rem;}
+
+  .drug-tabs{
+    display:flex; gap:6px; margin-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+  .drug-tabs button{
+    flex:1; padding:11px 6px; background:none; border:none;
+    font-family:var(--sans); font-size:0.88rem; font-weight:600;
+    color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent;
+    margin-bottom:-1px; transition:color .15s, border-color .15s;
+  }
+  .drug-tabs button.active{ color:var(--accent-deep); border-bottom-color:var(--accent); }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:20px; margin-bottom:16px;
+  }
+  .drug-meta{
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 18px;
+    font-family:var(--mono); font-size:0.8rem; color:var(--ink-soft);
+    padding-bottom:14px; margin-bottom:16px; border-bottom:1px dashed var(--line);
+  }
+  .drug-meta span b{ color:var(--ink); font-weight:600; }
+
+  label{ display:block; font-size:0.86rem; font-weight:600; margin-bottom:6px; }
+  .hint{ font-size:0.78rem; color:var(--ink-soft); font-weight:400; margin-left:4px; }
+  .field{ margin-bottom:16px; }
+  input[type=number]{
+    width:100%; padding:11px 12px; font-size:1.05rem; font-family:var(--mono);
+    border:1px solid var(--line); border-radius:7px; background:var(--paper);
+    color:var(--ink); -moz-appearance:textfield;
+  }
+  input[type=number]:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+  input[type=range]{ width:100%; accent-color: var(--accent); margin-top:8px; }
+  .range-labels{ display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.72rem; color:var(--ink-soft); margin-top:2px; }
+
+  .result{
+    margin-top:4px; padding:18px; border-radius:9px;
+    background:linear-gradient(180deg, var(--accent-deep), var(--accent));
+    color:#04211c; text-align:center;
+  }
+  :root[data-theme="dark"] .result, @media (prefers-color-scheme:dark){ .result{ color:#03130f; } }
+  .result .num{ font-family:var(--serif); font-size:2.6rem; font-weight:700; line-height:1; }
+  .result .unit{ font-size:0.95rem; font-weight:600; margin-top:4px; }
+  .result .warn-flag{
+    margin-top:10px; font-size:0.78rem; font-weight:600;
+    background:rgba(0,0,0,0.14); border-radius:6px; padding:5px 9px; display:inline-block;
+  }
+
+  .formula{
+    margin-top:16px; font-family:var(--mono); font-size:0.78rem; color:var(--ink-soft);
+    background:var(--paper); border:1px solid var(--line); border-radius:7px; padding:10px 12px;
+  }
+  .formula b{ color:var(--ink); }
+
+  footer{ text-align:center; font-size:0.74rem; color:var(--ink-soft); margin-top:22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Kecepatan Syringe Pump</h1>
+    <p>Kalkulator dosis obat vasoaktif — dopamin, norepinefrin, dobutamin</p>
+  </header>
+
+  <div class="drug-tabs" id="tabs"></div>
+
+  <div class="panel">
+    <div class="drug-meta" id="drugMeta"></div>
+
+    <div class="field">
+      <label for="bb">Berat badan <span class="hint">kg</span></label>
+      <input type="number" id="bb" inputmode="decimal" placeholder="cth. 60" min="1" step="0.1">
+    </div>
+
+    <div class="field">
+      <label for="dosis">Dosis <span class="hint" id="dosisHint"></span></label>
+      <input type="number" id="dosis" inputmode="decimal" step="0.01">
+      <input type="range" id="dosisSlider" step="0.01">
+      <div class="range-labels"><span id="rangeMin"></span><span id="rangeMax"></span></div>
+    </div>
+
+    <div class="result">
+      <div class="num" id="rateOut">–</div>
+      <div class="unit">ml/jam</div>
+      <div class="warn-flag" id="warnFlag" style="display:none;"></div>
+    </div>
+
+    <div class="formula">
+      Kecepatan (ml/jam) = <b>Dosis × BB × 60</b> ÷ Konsentrasi (µg/ml)
+    </div>
+  </div>
+
+  <footer>Verifikasi ulang perhitungan sebelum pemberian ke pasien.<br><a href="https://kalkulator.drsppd.com" style="color:var(--accent-deep); text-decoration:underline;">kalkulator.drsppd.com</a></footer>
+</div>
+
+<script>
+const drugs = [
+  {
+    key: "dopamin",
+    label: "Dopamin",
+    fullName: "DOPAMIN",
+    dilution: "200 mg / 50 cc",
+    concEntry: "1 cc = 4000 mcg",
+    concValue: 4000,
+    doseMin: 1, doseMax: 20, doseStep: 1, doseDefault: 5,
+    doseUnit: "mcg/kgBB/menit",
+    example: "cth. 1–20"
+  },
+  {
+    key: "norepinefrin",
+    label: "Norepinefrin",
+    fullName: "VASKON / RAIVAS / NOREPINEFRIN",
+    dilution: "4 mg / 50 cc",
+    concEntry: "1 cc = 80 mcg",
+    concValue: 80,
+    doseMin: 0.05, doseMax: 1, doseStep: 0.01, doseDefault: 0.1,
+    doseUnit: "mcg/kgBB/menit",
+    example: "cth. 0,05–1"
+  },
+  {
+    key: "dobutamin",
+    label: "Dobutamin",
+    fullName: "DOBUTAMIN",
+    dilution: "250 mg / 50 cc",
+    concEntry: "1 cc = 5000 mcg",
+    concValue: 5000,
+    doseMin: 3, doseMax: 15, doseStep: 0.5, doseDefault: 5,
+    doseUnit: "mcg/kgBB/menit",
+    example: "cth. 3–15"
+  }
+];
+
+let active = drugs[0];
+let bbVal = null;
+
+const tabsEl = document.getElementById("tabs");
+const drugMetaEl = document.getElementById("drugMeta");
+const bbInput = document.getElementById("bb");
+const dosisInput = document.getElementById("dosis");
+const dosisSlider = document.getElementById("dosisSlider");
+const dosisHint = document.getElementById("dosisHint");
+const rangeMin = document.getElementById("rangeMin");
+const rangeMax = document.getElementById("rangeMax");
+const rateOut = document.getElementById("rateOut");
+const warnFlag = document.getElementById("warnFlag");
+
+function buildTabs(){
+  tabsEl.innerHTML = "";
+  drugs.forEach(d => {
+    const btn = document.createElement("button");
+    btn.textContent = d.label;
+    btn.className = d.key === active.key ? "active" : "";
+    btn.onclick = () => { active = d; render(); };
+    tabsEl.appendChild(btn);
+  });
+}
+
+function render(){
+  buildTabs();
+  drugMetaEl.innerHTML =
+    "<span>Obat <b>" + active.fullName + "</b></span>" +
+    "<span>Pengenceran <b>" + active.dilution + "</b></span>" +
+    "<span>Konsentrasi <b>" + active.concEntry + "</b></span>";
+
+  dosisHint.textContent = active.doseUnit + " (" + active.example + ")";
+  dosisSlider.min = active.doseMin;
+  dosisSlider.max = active.doseMax;
+  dosisSlider.step = active.doseStep;
+  dosisSlider.value = active.doseDefault;
+  dosisInput.value = active.doseDefault;
+  dosisInput.step = active.doseStep;
+  rangeMin.textContent = active.doseMin + " mcg/kg/mnt";
+  rangeMax.textContent = active.doseMax + " mcg/kg/mnt";
+
+  calc();
+}
+
+function calc(){
+  const bb = parseFloat(bbInput.value);
+  const dosis = parseFloat(dosisInput.value);
+
+  if(!bb || bb <= 0 || isNaN(dosis)){
+    rateOut.textContent = "–";
+    warnFlag.style.display = "none";
+    return;
+  }
+
+  const rate = (dosis * bb * 60) / active.concValue;
+  rateOut.textContent = rate < 10 ? rate.toFixed(2) : rate.toFixed(1);
+
+  if(dosis < active.doseMin || dosis > active.doseMax){
+    warnFlag.style.display = "inline-block";
+    warnFlag.textContent = "Di luar rentang lazim " + active.doseMin + "–" + active.doseMax + " " + active.doseUnit;
+  } else {
+    warnFlag.style.display = "none";
+  }
+}
+
+bbInput.addEventListener("input", calc);
+dosisInput.addEventListener("input", () => { dosisSlider.value = dosisInput.value; calc(); });
+dosisSlider.addEventListener("input", () => { dosisInput.value = dosisSlider.value; calc(); });
+
+render();
+</script>
+</body>
+</html>
