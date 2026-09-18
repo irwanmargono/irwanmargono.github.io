@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Heparin STEMI</title>
+<style>
+  :root{
+    --navy:#0f2a3d;
+    --navy-deep:#081826;
+    --teal:#1b7f79;
+    --teal-light:#e7f3f1;
+    --paper:#f7f9fa;
+    --line:#dfe6e9;
+    --ink:#1c2b33;
+    --muted:#5b6b73;
+    --red:#b5453d;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0f1720;
+      --ink:#e7edf0;
+      --muted:#98a7ae;
+      --line:#26343d;
+      --teal-light:#122824;
+      --navy:#dfe9ee;
+      --navy-deep:#f2f6f8;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0f1720;
+    --ink:#e7edf0;
+    --muted:#98a7ae;
+    --line:#26343d;
+    --teal-light:#122824;
+    --navy:#dfe9ee;
+    --navy-deep:#f2f6f8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 48px;
+  }
+  .sheet{
+    width:100%;
+    max-width:460px;
+  }
+  .masthead{
+    border-bottom:2px solid var(--navy-deep);
+    padding-bottom:14px;
+    margin-bottom:22px;
+  }
+  .masthead h1{
+    font-size:1.32rem;
+    line-height:1.3;
+    margin:0 0 4px;
+    color:var(--navy-deep);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .masthead p{
+    margin:0;
+    color:var(--muted);
+    font-size:0.86rem;
+  }
+  .protocol{
+    background:var(--teal-light);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:22px;
+    font-size:0.84rem;
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .protocol strong{ color:var(--teal); }
+  label{
+    display:block;
+    font-size:0.86rem;
+    font-weight:600;
+    margin-bottom:8px;
+    color:var(--navy-deep);
+  }
+  .input-row{
+    display:flex;
+    align-items:stretch;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:26px;
+    background:transparent;
+  }
+  .input-row input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:var(--ink);
+    font-size:1.4rem;
+    font-weight:600;
+    padding:12px 14px;
+    -moz-appearance:textfield;
+  }
+  .input-row input::-webkit-outer-spin-button,
+  .input-row input::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+  .input-row input:focus{
+    background: var(--teal-light);
+  }
+  .input-row span{
+    display:flex;
+    align-items:center;
+    padding:0 14px;
+    font-size:0.86rem;
+    color:var(--muted);
+    border-left:1.5px solid var(--line);
+  }
+  .results{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .result-card{
+    border:1.5px solid var(--line);
+    padding:16px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:12px;
+  }
+  .result-card:first-child{
+    border-radius:10px 10px 0 0;
+  }
+  .result-card:last-child{
+    border-radius:0 0 10px 10px;
+    border-top:none;
+  }
+  .result-card.mid{
+    border-top:none;
+  }
+  .result-label{
+    font-size:0.86rem;
+    color:var(--muted);
+    font-weight:500;
+  }
+  .result-label small{
+    display:block;
+    font-size:0.76rem;
+    margin-top:2px;
+    color:var(--muted);
+    opacity:0.8;
+  }
+  .result-value{
+    font-size:1.5rem;
+    font-weight:700;
+    color:var(--navy-deep);
+    white-space:nowrap;
+  }
+  .result-value.accent{
+    color:var(--teal);
+  }
+  .result-value sup{
+    font-size:0.78rem;
+    font-weight:600;
+    margin-left:3px;
+    color:var(--muted);
+  }
+  .warn{
+    margin-top:16px;
+    font-size:0.78rem;
+    color:var(--muted);
+    text-align:center;
+    line-height:1.5;
+  }
+  footer{
+    margin-top:34px;
+    text-align:center;
+    font-size:0.8rem;
+  }
+  footer a{
+    color:var(--teal);
+    text-decoration:none;
+    font-weight:600;
+    border-bottom:1px solid transparent;
+  }
+  footer a:hover{
+    border-bottom-color:var(--teal);
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="masthead">
+    <h1>Kalkulator Heparin — STEMI</h1>
+    <p>Dosis loading dan laju syringe pump berdasarkan berat badan</p>
+  </div>
+
+  <div class="protocol">
+    <strong>Sediaan:</strong> 1 ampul heparin 25.000 unit/5 ml, diencerkan menjadi 50 ml (konsentrasi 500 unit/ml).<br>
+    <strong>Loading bolus:</strong> 60 unit/kgBB &nbsp;·&nbsp; <strong>Rumatan (SP):</strong> 12 unit/kgBB/jam
+  </div>
+
+  <label for="bw">Berat badan</label>
+  <div class="input-row">
+    <input type="number" id="bw" inputmode="decimal" placeholder="mis. 60" min="0" step="0.1">
+    <span>kg</span>
+  </div>
+
+  <div class="results">
+    <div class="result-card">
+      <div class="result-label">Loading dose<small>bolus IV perlahan</small></div>
+      <div class="result-value" id="loadingUnit">— <sup>unit</sup></div>
+    </div>
+    <div class="result-card mid">
+      <div class="result-label">Volume bolus<small>dari larutan 500 unit/ml</small></div>
+      <div class="result-value accent" id="loadingVol">— <sup>ml</sup></div>
+    </div>
+    <div class="result-card">
+      <div class="result-label">Dosis rumatan<small>12 unit/kgBB/jam</small></div>
+      <div class="result-value" id="maintUnit">— <sup>unit/jam</sup></div>
+    </div>
+    <div class="result-card mid">
+      <div class="result-label">Syringe pump<small>kecepatan infus</small></div>
+      <div class="result-value accent" id="maintVol">— <sup>ml/jam</sup></div>
+    </div>
+  </div>
+
+  <div class="warn">Verifikasi ulang perhitungan secara manual dan sesuaikan dengan aPTT serta kebijakan klinis setempat.</div>
+
+  <footer><a href="https://kalkulator.drsppd.com" target="_blank" rel="noopener">kalkulator.drsppd.com</a></footer>
+
+</div>
+
+<script>
+  const CONC = 500; // unit/ml, dari 25000 unit / 50 ml
+  const bwInput = document.getElementById('bw');
+  const loadingUnit = document.getElementById('loadingUnit');
+  const loadingVol = document.getElementById('loadingVol');
+  const maintUnit = document.getElementById('maintUnit');
+  const maintVol = document.getElementById('maintVol');
+
+  function fmt(n, decimals){
+    return n.toLocaleString('id-ID', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
+  }
+
+  function calculate(){
+    const bw = parseFloat(bwInput.value);
+    if(!bw || bw <= 0){
+      loadingUnit.innerHTML = '— <sup>unit</sup>';
+      loadingVol.innerHTML = '— <sup>ml</sup>';
+      maintUnit.innerHTML = '— <sup>unit/jam</sup>';
+      maintVol.innerHTML = '— <sup>ml/jam</sup>';
+      return;
+    }
+    const loadU = 60 * bw;
+    const loadV = loadU / CONC;
+    const maintU = 12 * bw;
+    const maintV = maintU / CONC;
+
+    loadingUnit.innerHTML = fmt(loadU, 0) + ' <sup>unit</sup>';
+    loadingVol.innerHTML = fmt(loadV, 1) + ' <sup>ml</sup>';
+    maintUnit.innerHTML = fmt(maintU, 0) + ' <sup>unit/jam</sup>';
+    maintVol.innerHTML = fmt(maintV, 1) + ' <sup>ml/jam</sup>';
+  }
+
+  bwInput.addEventListener('input', calculate);
+</script>
+</body>
+</html>
