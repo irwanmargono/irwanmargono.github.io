@@ -214,7 +214,7 @@
 
   <div class="protocol">
     <strong>Sediaan:</strong> 1 ampul heparin 25.000 unit/5 ml, diencerkan menjadi 50 ml (konsentrasi 500 unit/ml).<br>
-    <strong>Loading bolus:</strong> 60 unit/kgBB &nbsp;·&nbsp; <strong>Rumatan (SP):</strong> 12 unit/kgBB/jam
+    <strong>Loading bolus:</strong> 60 unit/kgBB (maks 4000 unit) &nbsp;·&nbsp; <strong>Rumatan (SP):</strong> 12 unit/kgBB/jam (maks 1000 unit/jam)
   </div>
 
   <label for="bw">Berat badan</label>
@@ -242,6 +242,8 @@
     </div>
   </div>
 
+  <div class="warn" id="capNote" style="display:none; color:var(--red); font-weight:600;"></div>
+
   <div class="warn">Verifikasi ulang perhitungan secara manual dan sesuaikan dengan aPTT serta kebijakan klinis setempat.</div>
 
   <footer><a href="https://kalkulator.drsppd.com" target="_blank" rel="noopener">kalkulator.drsppd.com</a></footer>
@@ -250,11 +252,14 @@
 
 <script>
   const CONC = 500; // unit/ml, dari 25000 unit / 50 ml
+  const MAX_LOAD = 4000; // unit
+  const MAX_MAINT = 1000; // unit/jam
   const bwInput = document.getElementById('bw');
   const loadingUnit = document.getElementById('loadingUnit');
   const loadingVol = document.getElementById('loadingVol');
   const maintUnit = document.getElementById('maintUnit');
   const maintVol = document.getElementById('maintVol');
+  const capNote = document.getElementById('capNote');
 
   function fmt(n, decimals){
     return n.toLocaleString('id-ID', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
@@ -267,17 +272,36 @@
       loadingVol.innerHTML = '— <sup>ml</sup>';
       maintUnit.innerHTML = '— <sup>unit/jam</sup>';
       maintVol.innerHTML = '— <sup>ml/jam</sup>';
+      capNote.style.display = 'none';
       return;
     }
-    const loadU = 60 * bw;
+    let loadU = 60 * bw;
+    let maintU = 12 * bw;
+    const notes = [];
+
+    if(loadU > MAX_LOAD){
+      loadU = MAX_LOAD;
+      notes.push('Loading dose dibatasi maksimal ' + MAX_LOAD.toLocaleString('id-ID') + ' unit');
+    }
+    if(maintU > MAX_MAINT){
+      maintU = MAX_MAINT;
+      notes.push('Dosis rumatan dibatasi maksimal ' + MAX_MAINT.toLocaleString('id-ID') + ' unit/jam');
+    }
+
     const loadV = loadU / CONC;
-    const maintU = 12 * bw;
     const maintV = maintU / CONC;
 
     loadingUnit.innerHTML = fmt(loadU, 0) + ' <sup>unit</sup>';
     loadingVol.innerHTML = fmt(loadV, 1) + ' <sup>ml</sup>';
     maintUnit.innerHTML = fmt(maintU, 0) + ' <sup>unit/jam</sup>';
     maintVol.innerHTML = fmt(maintV, 1) + ' <sup>ml/jam</sup>';
+
+    if(notes.length){
+      capNote.style.display = 'block';
+      capNote.innerHTML = notes.join('<br>');
+    } else {
+      capNote.style.display = 'none';
+    }
   }
 
   bwInput.addEventListener('input', calculate);
