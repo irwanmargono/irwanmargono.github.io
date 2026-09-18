@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+   <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-844V4M0GRC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-844V4M0GRC');
+</script>
+<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Dosis SP Aminofilin</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --accent: #0d6efd;
+    --accent-light: #e7f1ff;
+    --border: #e2e8f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12141c;
+      --card: #1b1e29;
+      --text: #f1f2f6;
+      --muted: #9aa0ab;
+      --accent: #4d8dff;
+      --accent-light: #1e2a44;
+      --border: #2c3040;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12141c;
+    --card: #1b1e29;
+    --text: #f1f2f6;
+    --muted: #9aa0ab;
+    --accent: #4d8dff;
+    --accent-light: #1e2a44;
+    --border: #2c3040;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .container { width: 100%; max-width: 460px; }
+  h1 { font-size: 1.3rem; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .info-box {
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+  label:first-of-type { margin-top: 0; }
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+  }
+  input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .result {
+    margin-top: 20px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: var(--accent-light);
+  }
+  .result .rate {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .result .unit { font-size: 1rem; color: var(--muted); }
+  .result .detail {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .warn {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 14px;
+  }
+  .placeholder {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 10px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>💉 Kalkulator SP Aminofilin</h1>
+  <div class="subtitle">Setting kecepatan syringe pump berdasarkan dosis dan berat badan</div>
+
+  <div class="card">
+    <div class="info-box">
+      <strong>Sediaan:</strong> 1 ampul Aminofilin (240 mg/10 ml) + aquabidest 40 ml → total 50 ml pada spuit 50 ml.<br>
+      <strong>Konsentrasi akhir:</strong> 240 mg / 50 ml = 4,8 mg/ml.
+    </div>
+
+    <label for="dosis">Dosis (mg/kgBB/jam)</label>
+    <input type="number" id="dosis" step="0.01" min="0" placeholder="contoh: 0.5" oninput="hitung()">
+
+    <label for="bb">Berat Badan (kg)</label>
+    <input type="number" id="bb" step="0.1" min="0" placeholder="contoh: 60" oninput="hitung()">
+
+    <div id="hasil"></div>
+  </div>
+
+  <div class="warn">Alat bantu hitung — tetap lakukan verifikasi klinis dan sesuaikan dosis maksimal/monitoring sesuai kondisi pasien.</div>
+</div>
+
+<script>
+function hitung() {
+  const dosis = parseFloat(document.getElementById('dosis').value);
+  const bb = parseFloat(document.getElementById('bb').value);
+  const hasil = document.getElementById('hasil');
+  const konsentrasi = 4.8; // mg/ml
+
+  if (isNaN(dosis) || isNaN(bb) || dosis <= 0 || bb <= 0) {
+    hasil.innerHTML = '<div class="placeholder">Masukkan dosis dan berat badan untuk melihat hasil</div>';
+    return;
+  }
+
+  const totalMgPerJam = dosis * bb;
+  const rateMlPerJam = totalMgPerJam / konsentrasi;
+
+  hasil.innerHTML = `
+    <div class="result">
+      <div class="rate">${rateMlPerJam.toFixed(2)}</div>
+      <div class="unit">ml/jam</div>
+      <div class="detail">
+        Dosis total: ${totalMgPerJam.toFixed(2)} mg/jam<br>
+        (${dosis} mg/kg/jam × ${bb} kg)<br>
+        Konsentrasi larutan: ${konsentrasi} mg/ml
+      </div>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
