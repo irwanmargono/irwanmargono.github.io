@@ -24,6 +24,8 @@
       --accent2: #63b3ed;
       --accent3: #f65555;
       --accent4: #f6ad55;
+      --accent5: #a78bfa;
+      --accent6: #f472b6;
       --text: #e2e8f0;
       --muted: #718096;
       --border: rgba(255,255,255,0.07);
@@ -138,10 +140,14 @@
     }
 
     .card:nth-child(1) { animation-delay: 0.1s; --c: var(--accent); }
-    .card:nth-child(2) { animation-delay: 0.2s; --c: var(--accent2); }
-    .card:nth-child(3) { animation-delay: 0.3s; --c: var(--accent3); }
+    .card:nth-child(2) { animation-delay: 0.2s; --c: var(--accent5); }
+    .card:nth-child(3) { animation-delay: 0.3s; --c: var(--accent6); }
     .card:nth-child(4) { animation-delay: 0.4s; --c: var(--accent3); }
-    .card:nth-child(5) { animation-delay: 0.5s; --c: var(--accent4); }
+    .card:nth-child(5) { animation-delay: 0.5s; --c: var(--accent2); }
+    .card:nth-child(6) { animation-delay: 0.6s; --c: var(--accent4); }
+    .card:nth-child(7) { animation-delay: 0.7s; --c: var(--accent2); }
+    .card:nth-child(8) { animation-delay: 0.8s; --c: var(--accent4); }
+
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -298,6 +304,36 @@
         <div class="card-label">Elektrolit</div>
         <div class="card-title">Kalkulator Hipokalemia</div>
         <div class="card-desc">Estimasi defisit kalium &amp; kebutuhan koreksi</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="https://kalkulator.drsppd.com/kalkulator-vasoaktif.html" target="_blank" rel="noopener" class="card">
+      <div class="icon-wrap">💉</div>
+      <div class="card-body">
+        <div class="card-label">Kardiovaskular</div>
+        <div class="card-title">Kalkulator Vasoaktif</div>
+        <div class="card-desc">Dosis &amp; titrasi obat vasoaktif/inotropik</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="https://kalkulator.drsppd.com/kalkulator-sp-aminofilin.html" target="_blank" rel="noopener" class="card">
+      <div class="icon-wrap">💊</div>
+      <div class="card-body">
+        <div class="card-label">Respirasi</div>
+        <div class="card-title">Kalkulator Sp Aminofilin</div>
+        <div class="card-desc">Dosis syringe pump aminofilin</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="https://kalkulator.drsppd.com/heparin-stemi.html" target="_blank" rel="noopener" class="card">
+      <div class="icon-wrap">🩸</div>
+      <div class="card-body">
+        <div class="card-label">Kardiovaskular</div>
+        <div class="card-title">Kalkulator Heparin STEMI</div>
+        <div class="card-desc">Dosis heparin pada tatalaksana STEMI</div>
       </div>
       <div class="arrow">→</div>
     </a>
