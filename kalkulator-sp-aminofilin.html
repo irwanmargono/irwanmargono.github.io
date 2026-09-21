@@ -125,6 +125,20 @@
     font-size: 0.9rem;
     padding: 10px 0;
   }
+  footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    line-height: 1.6;
+  }
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -148,6 +162,10 @@
   </div>
 
   <div class="warn">Alat bantu hitung — tetap lakukan verifikasi klinis dan sesuaikan dosis maksimal/monitoring sesuai kondisi pasien.</div>
+
+  <footer>
+    &copy; <span id="tahun"></span> dr. Irwan, Sp.PD &middot; <a href="https://kalkulator.drsppd.com">Kalkulator Medis</a> &middot; <a href="https://drsppd.com">drsppd.com</a>
+  </footer>
 </div>
 
 <script>
@@ -177,6 +195,7 @@ function hitung() {
     </div>
   `;
 }
+document.getElementById('tahun').textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
