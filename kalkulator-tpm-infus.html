@@ -222,6 +222,18 @@
     color: var(--ink-soft);
     margin-left: 0.3rem;
   }
+  .row-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+  }
+  .row .interval {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
   .row.macro .value { color: var(--clinic-green-deep); }
   .row.mikro .value { color: var(--accent); }
 
@@ -311,6 +323,16 @@
     return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1);
   }
 
+  function intervalText(tpm) {
+    if (!tpm || tpm <= 0) return '';
+    const detikPerTetes = 60 / tpm;
+    if (detikPerTetes >= 1) {
+      return `1 tetes / ${fmt(detikPerTetes)} detik`;
+    }
+    const tetesPerDetik = tpm / 60;
+    return `${fmt(tetesPerDetik)} tetes / detik`;
+  }
+
   function render() {
     const vol = parseFloat(volumeInput.value);
     const jam = parseFloat(durasiInput.value);
@@ -332,11 +354,17 @@
         <div class="rows">
           <div class="row macro">
             <span class="label">Faktor 15 gtt/ml</span>
-            <span class="value">${fmt(macro15)}<span class="unit">tpm</span></span>
+            <span class="row-main">
+              <span class="value">${fmt(macro15)}<span class="unit">tpm</span></span>
+              <span class="interval">${intervalText(macro15)}</span>
+            </span>
           </div>
           <div class="row macro">
             <span class="label">Faktor 20 gtt/ml</span>
-            <span class="value">${fmt(macro20)}<span class="unit">tpm</span></span>
+            <span class="row-main">
+              <span class="value">${fmt(macro20)}<span class="unit">tpm</span></span>
+              <span class="interval">${intervalText(macro20)}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -345,7 +373,10 @@
         <div class="rows">
           <div class="row mikro">
             <span class="label">Faktor 60 gtt/ml</span>
-            <span class="value">${fmt(mikro60)}<span class="unit">tpm</span></span>
+            <span class="row-main">
+              <span class="value">${fmt(mikro60)}<span class="unit">tpm</span></span>
+              <span class="interval">${intervalText(mikro60)}</span>
+            </span>
           </div>
         </div>
         <p class="rate-note">Setara ${fmt(mlPerJam)} ml/jam &middot; ${fmt(vol)} ml diberikan dalam ${fmt(jam)} jam.</p>
