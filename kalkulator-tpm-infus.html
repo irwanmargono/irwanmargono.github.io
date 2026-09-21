@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-844V4M0GRC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-844V4M0GRC');
+</script>
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator Tetes Infus (TPM)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14211f;
+    --ink-soft: #45564f;
+    --paper: #f4f1e9;
+    --paper-raised: #ffffff;
+    --line: #cfc7b4;
+    --clinic-green: #1f5f4f;
+    --clinic-green-deep: #123c32;
+    --accent: #b5502f;
+    --macro-tint: #eaf1ec;
+    --mikro-tint: #f4ece1;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #ece7da;
+      --ink-soft: #b7c2ba;
+      --paper: #10201b;
+      --paper-raised: #16281f;
+      --line: #33473c;
+      --clinic-green: #6fbfa2;
+      --clinic-green-deep: #9adcc0;
+      --accent: #e29a75;
+      --macro-tint: #1a2e26;
+      --mikro-tint: #2a2318;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #ece7da;
+    --ink-soft: #b7c2ba;
+    --paper: #10201b;
+    --paper-raised: #16281f;
+    --line: #33473c;
+    --clinic-green: #6fbfa2;
+    --clinic-green-deep: #9adcc0;
+    --accent: #e29a75;
+    --macro-tint: #1a2e26;
+    --mikro-tint: #2a2318;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2.25rem 1.25rem 3rem;
+  }
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1.1rem;
+    margin-bottom: 1.75rem;
+  }
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: var(--clinic-green);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 6vw, 2.15rem);
+    line-height: 1.15;
+    margin: 0.35rem 0 0.4rem;
+    color: var(--ink);
+  }
+  .lede {
+    font-size: 0.96rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin: 0;
+    max-width: 54ch;
+  }
+  .lede code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    padding: 0.05rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.85em;
+  }
+
+  form.inputs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.6rem;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .field label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .field .unit-hint {
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+  .field-input {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper-raised);
+    overflow: hidden;
+  }
+  .field-input:focus-within {
+    border-color: var(--clinic-green);
+    outline: 2px solid color-mix(in srgb, var(--clinic-green) 30%, transparent);
+    outline-offset: 1px;
+  }
+  .field-input input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    padding: 0.7rem 0.75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .field-input input:focus { outline: none; }
+  .field-input span.suffix {
+    display: flex;
+    align-items: center;
+    padding: 0 0.8rem;
+    background: color-mix(in srgb, var(--clinic-green) 10%, transparent);
+    color: var(--clinic-green);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: 'IBM Plex Mono', monospace;
+    border-left: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+
+  .results {
+    display: grid;
+    gap: 0.9rem;
+  }
+  .group {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1rem 1.1rem 1.1rem;
+    background: var(--paper-raised);
+  }
+  .group-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0 0 0.7rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .group-title .set-name { color: var(--ink); font-size: 0.85rem; }
+  .rows { display: grid; gap: 0.55rem; }
+  .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0.55rem 0.75rem;
+    border-radius: 4px;
+  }
+  .row.macro { background: var(--macro-tint); }
+  .row.mikro { background: var(--mikro-tint); }
+  .row .label {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .row .value {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .row .value .unit {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-left: 0.3rem;
+  }
+  .row.macro .value { color: var(--clinic-green-deep); }
+  .row.mikro .value { color: var(--accent); }
+
+  .rate-note {
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    margin-top: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+  }
+
+  footer {
+    margin-top: 2.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--line);
+  }
+  .disclaimer {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0 0 0.9rem;
+  }
+  .footer-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--clinic-green);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--clinic-green) 45%, transparent);
+    padding-bottom: 1px;
+  }
+  .footer-link:hover { border-bottom-color: var(--clinic-green); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="kicker">Kalkulator Klinis</div>
+    <h1>Tetes Infus per Menit (TPM)</h1>
+    <p class="lede">Masukkan volume cairan dan lama pemberian. Hasil dihitung untuk faktor tetes makro <code>15</code> &amp; <code>20</code> dan mikro <code>60</code> sekaligus.</p>
+  </header>
+
+  <form class="inputs" onsubmit="return false;">
+    <div class="field">
+      <label for="volume">Volume cairan</label>
+      <div class="field-input">
+        <input type="number" id="volume" inputmode="decimal" min="0" step="any" placeholder="500" />
+        <span class="suffix">ml</span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="durasi">Lama pemberian</label>
+      <div class="field-input">
+        <input type="number" id="durasi" inputmode="decimal" min="0" step="any" placeholder="8" />
+        <span class="suffix">jam</span>
+      </div>
+    </div>
+  </form>
+
+  <section class="results" id="results" aria-live="polite">
+    <div class="empty-state">Isi volume (ml) dan durasi (jam) untuk melihat hasil tetes per menit.</div>
+  </section>
+
+  <footer>
+    <p class="disclaimer">
+      Kalkulator ini hanya alat bantu hitung matematis dan tidak menggantikan penilaian klinis. Faktor tetes dapat berbeda tergantung set infus yang digunakan (periksa kemasan set infus). Selalu sesuaikan kecepatan tetesan dan pemantauan pasien sesuai kondisi klinis, instruksi dokter penanggung jawab, dan kebijakan fasilitas kesehatan setempat.
+    </p>
+    <a class="footer-link" href="https://kalkulator.drsppd.com" target="_blank" rel="noopener">kalkulator.drsppd.com →</a>
+  </footer>
+
+</div>
+
+<script>
+  const volumeInput = document.getElementById('volume');
+  const durasiInput = document.getElementById('durasi');
+  const resultsEl = document.getElementById('results');
+
+  function fmt(n) {
+    if (!isFinite(n)) return '—';
+    const rounded = Math.round(n * 10) / 10;
+    return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1);
+  }
+
+  function render() {
+    const vol = parseFloat(volumeInput.value);
+    const jam = parseFloat(durasiInput.value);
+
+    if (!vol || !jam || vol <= 0 || jam <= 0) {
+      resultsEl.innerHTML = '<div class="empty-state">Isi volume (ml) dan durasi (jam) untuk melihat hasil tetes per menit.</div>';
+      return;
+    }
+
+    const menit = jam * 60;
+    const macro15 = (vol * 15) / menit;
+    const macro20 = (vol * 20) / menit;
+    const mikro60 = (vol * 60) / menit;
+    const mlPerJam = vol / jam;
+
+    resultsEl.innerHTML = `
+      <div class="group">
+        <div class="group-title"><span class="set-name">Makro drip</span><span>faktor tetes 15 &amp; 20</span></div>
+        <div class="rows">
+          <div class="row macro">
+            <span class="label">Faktor 15 gtt/ml</span>
+            <span class="value">${fmt(macro15)}<span class="unit">tpm</span></span>
+          </div>
+          <div class="row macro">
+            <span class="label">Faktor 20 gtt/ml</span>
+            <span class="value">${fmt(macro20)}<span class="unit">tpm</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-title"><span class="set-name">Mikro drip</span><span>faktor tetes 60</span></div>
+        <div class="rows">
+          <div class="row mikro">
+            <span class="label">Faktor 60 gtt/ml</span>
+            <span class="value">${fmt(mikro60)}<span class="unit">tpm</span></span>
+          </div>
+        </div>
+        <p class="rate-note">Setara ${fmt(mlPerJam)} ml/jam &middot; ${fmt(vol)} ml diberikan dalam ${fmt(jam)} jam.</p>
+      </div>
+    `;
+  }
+
+  volumeInput.addEventListener('input', render);
+  durasiInput.addEventListener('input', render);
+</script>
+</body>
+</html>
