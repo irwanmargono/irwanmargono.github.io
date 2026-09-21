@@ -147,6 +147,17 @@
     .card:nth-child(6) { animation-delay: 0.6s; --c: var(--accent4); }
     .card:nth-child(7) { animation-delay: 0.7s; --c: var(--accent2); }
     .card:nth-child(8) { animation-delay: 0.8s; --c: var(--accent4); }
+    .card:nth-child(9) { animation-delay: 0.9s; --c: var(--accent5); }
+
+    /* ── Drip animation for infusion icon ── */
+    @keyframes dripPulse {
+      0%, 100% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(3px); opacity: 0.6; }
+    }
+    .card.drip .icon-wrap span {
+      display: inline-block;
+      animation: dripPulse 1.6s ease-in-out infinite;
+    }
 
 
     @keyframes fadeUp {
@@ -314,6 +325,16 @@
         <div class="card-label">Kardiovaskular</div>
         <div class="card-title">Kalkulator Vasoaktif</div>
         <div class="card-desc">Dosis &amp; titrasi obat vasoaktif/inotropik</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="https://kalkulator.drsppd.com/kalkulator-tpm-infus.html" target="_blank" rel="noopener" class="card drip" style="--c: var(--accent2);">
+      <div class="icon-wrap"><span>💧</span></div>
+      <div class="card-body">
+        <div class="card-label">Cairan &amp; Infus</div>
+        <div class="card-title">Kalkulator Tetesan Infus (TPM)</div>
+        <div class="card-desc">Hitung jumlah tetesan infus per menit</div>
       </div>
       <div class="arrow">→</div>
     </a>
