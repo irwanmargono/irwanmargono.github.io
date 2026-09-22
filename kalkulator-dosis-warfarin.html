@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-844V4M0GRC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-844V4M0GRC');
+</script>
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator Dosis Warfarin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EC;
+    --paper-line:#DAD3C3;
+    --ink:#1C2A33;
+    --ink-soft:#5B6B72;
+    --safe:#2F6F5E;
+    --safe-bg:#E7EFEA;
+    --watch:#A45A28;
+    --watch-bg:#F3E7D9;
+    --danger:#9B3232;
+    --danger-bg:#F3E1DF;
+    --card:#FFFDF9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#171512;
+      --paper-line:#3A362E;
+      --ink:#EDE7DA;
+      --ink-soft:#A79E8E;
+      --card:#201D18;
+      --safe-bg:#1E2C26;
+      --watch-bg:#2E2318;
+      --danger-bg:#2E1D1C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#171512;
+    --paper-line:#3A362E;
+    --ink:#EDE7DA;
+    --ink-soft:#A79E8E;
+    --card:#201D18;
+    --safe-bg:#1E2C26;
+    --watch-bg:#2E2318;
+    --danger-bg:#2E1D1C;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    padding-top:calc(env(safe-area-inset-top,0px) + 28px);
+    padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px);
+    padding-left:18px;
+    padding-right:18px;
+    min-height:100%;
+  }
+  .sheet{
+    max-width:520px;
+    margin:0 auto;
+  }
+  .kop{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:14px;
+    margin-bottom:22px;
+  }
+  .kop .label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+  }
+  .kop h1{
+    font-family:'Lora',serif;
+    font-weight:600;
+    font-size:26px;
+    margin:4px 0 6px;
+    line-height:1.25;
+  }
+  .kop p{
+    margin:0;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    max-width:40ch;
+    line-height:1.5;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .field .sub{
+    font-size:12px;
+    color:var(--ink-soft);
+    font-weight:400;
+    margin-left:6px;
+  }
+  .row{display:flex; gap:12px;}
+  .row .field{flex:1;}
+  input[type=number], select{
+    width:100%;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:18px;
+    font-weight:500;
+    padding:10px 12px;
+    border:1.5px solid var(--paper-line);
+    border-radius:3px;
+    background:var(--paper);
+    color:var(--ink);
+    outline:none;
+  }
+  input[type=number]:focus, select:focus{
+    border-color:var(--ink);
+  }
+  select{font-family:'Inter',sans-serif; font-size:15px; font-weight:500;}
+  button{
+    width:100%;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    border-radius:3px;
+    padding:13px;
+    font-size:15px;
+    font-weight:600;
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  button:active{opacity:0.85;}
+  #hasil{display:none; margin-bottom:18px;}
+  .status-strip{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    padding:12px 16px;
+    border-radius:4px;
+    margin-bottom:14px;
+  }
+  .status-strip .inr-val{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:20px;
+    font-weight:600;
+  }
+  .status-strip .status-text{
+    font-size:13px;
+    font-weight:600;
+    text-align:right;
+  }
+  .st-safe{background:var(--safe-bg); color:var(--safe);}
+  .st-watch{background:var(--watch-bg); color:var(--watch);}
+  .st-danger{background:var(--danger-bg); color:var(--danger);}
+  .big-numbers{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .big-numbers .box{
+    flex:1;
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:12px 14px;
+  }
+  .big-numbers .box .k{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .big-numbers .box .v{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:19px;
+    font-weight:600;
+  }
+  .pilihan-persen{margin-bottom:16px;}
+  .pilihan-persen .judul{
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    letter-spacing:0.02em;
+  }
+  .seg{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+  }
+  .seg .opt{
+    border:1.5px solid var(--paper-line);
+    border-radius:4px;
+    padding:9px 4px;
+    text-align:center;
+    background:var(--paper);
+    cursor:pointer;
+  }
+  .seg .opt .p{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    font-weight:600;
+  }
+  .seg .opt .l{
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .seg .opt.active{
+    border-color:var(--ink);
+    background:var(--card);
+  }
+  .seg .opt.active .l{color:var(--ink);}
+  .instruksi{
+    font-size:14px;
+    line-height:1.55;
+    padding:12px 14px;
+    background:var(--paper);
+    border-left:3px solid var(--ink);
+    margin-bottom:16px;
+  }
+  .harian{
+    margin-bottom:6px;
+  }
+  .harian .judul{
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    letter-spacing:0.02em;
+  }
+  .pill-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+  }
+  .pill-grid .hari{
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    padding:8px 3px;
+    text-align:center;
+    background:var(--paper);
+  }
+  .pill-grid .hari .d{
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+  }
+  .pill-grid .hari .mg{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    font-weight:600;
+  }
+  .pill-grid .hari .tab{
+    font-size:9.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .pill-grid .hari.hari-gelap .d,
+  .pill-grid .hari.hari-gelap .mg,
+  .pill-grid .hari.hari-gelap .tab{
+    color:#FBFAF6;
+  }
+  .legenda-dosis{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:8px;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .legenda-dosis .bar{
+    flex:1;
+    height:6px;
+    border-radius:3px;
+    background:linear-gradient(to right, var(--paper), var(--safe));
+    border:1px solid var(--paper-line);
+  }
+  .kontrol{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    padding-top:12px;
+    margin-top:14px;
+    border-top:1px dashed var(--paper-line);
+  }
+  .kontrol .k1{color:var(--ink-soft);}
+  .kontrol .k2{font-weight:600;}
+  .disclaimer{
+    font-size:11.5px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    padding:14px 16px;
+    border:1px solid var(--paper-line);
+    border-radius:4px;
+    margin-bottom:18px;
+  }
+  .disclaimer strong{color:var(--ink);}
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding-top:6px;
+  }
+  footer a{
+    color:var(--ink);
+    text-decoration:none;
+    border-bottom:1px solid var(--paper-line);
+  }
+  .err{
+    color:var(--danger);
+    font-size:12.5px;
+    margin-top:6px;
+    display:none;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="kop">
+    <div class="label">KALKULATOR KLINIS</div>
+    <h1>Penyesuaian Dosis Mingguan Warfarin</h1>
+    <p>Berdasarkan nilai INR terkini dan dosis mingguan warfarin yang sedang berjalan.</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>Dosis warfarin mingguan saat ini <span class="sub">(mg/minggu)</span></label>
+      <input type="number" id="dosisMingguan" inputmode="decimal" placeholder="cth. 21" step="0.5" min="0">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Nilai INR</label>
+        <input type="number" id="inr" inputmode="decimal" placeholder="cth. 1.6" step="0.1" min="0">
+      </div>
+      <div class="field">
+        <label>Kekuatan tablet</label>
+        <select id="tablet">
+          <option value="2">2 mg</option>
+          <option value="5">5 mg</option>
+          <option value="1">1 mg</option>
+          <option value="3">3 mg</option>
+        </select>
+      </div>
+    </div>
+    <div class="err" id="err">Isi dosis mingguan dan nilai INR dengan angka yang valid.</div>
+    <button onclick="hitung()">Hitung Penyesuaian</button>
+  </div>
+
+  <div id="hasil">
+    <div class="status-strip" id="statusStrip">
+      <span class="inr-val" id="inrTampil"></span>
+      <span class="status-text" id="statusText"></span>
+    </div>
+
+    <div class="big-numbers">
+      <div class="box">
+        <div class="k">Dosis lama / minggu</div>
+        <div class="v" id="dosisLama"></div>
+      </div>
+      <div class="box">
+        <div class="k">Dosis baru / minggu</div>
+        <div class="v" id="dosisBaru"></div>
+      </div>
+    </div>
+
+    <div class="pilihan-persen" id="pilihanPersen" style="display:none;">
+      <div class="judul">PILIH BESAR PENYESUAIAN</div>
+      <div class="seg" id="segPersen"></div>
+    </div>
+
+    <div class="instruksi" id="instruksiTeks"></div>
+
+    <div class="harian">
+      <div class="judul">PEMBAGIAN DOSIS HARIAN</div>
+      <div class="pill-grid" id="pillGrid"></div>
+      <div class="legenda-dosis">
+        <span>Rendah</span>
+        <span class="bar"></span>
+        <span>Tinggi</span>
+      </div>
+    </div>
+
+    <div class="kontrol">
+      <span class="k1">Jadwal kontrol ulang INR</span>
+      <span class="k2" id="kontrolWaktu"></span>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> Kalkulator ini adalah alat bantu edukasi berdasarkan tabel nomogram penyesuaian dosis warfarin umum dan tidak menggantikan penilaian klinis. Untuk INR di luar rentang target, tersedia pilihan persentase penyesuaian terkecil, tengah, atau tertinggi sesuai rentang pada nomogram acuan; pemilihan besar penyesuaian tetap menjadi keputusan dokter berdasarkan kondisi klinis pasien (usia, interaksi obat, asupan vitamin K, riwayat perdarahan, komorbid). Selalu lakukan pemantauan INR sesuai jadwal yang dianjurkan.
+  </div>
+
+  <footer>
+    <a href="https://kalkulator.drsppd.com" target="_blank" rel="noopener">kalkulator.drsppd.com</a>
+  </footer>
+
+</div>
+
+<script>
+function getAturan(inr){
+  if(inr < 1.5) return {persenMin:10, persenMax:20, arah:1, teks:"Naikkan dosis mingguan 10–20%.", kontrol:"1 minggu", status:"watch", statusText:"Sub-terapeutik"};
+  if(inr <= 1.9) return {persenMin:5, persenMax:10, arah:1, teks:"Naikkan dosis mingguan 5–10%.", kontrol:"2 minggu", status:"watch", statusText:"Sub-terapeutik"};
+  if(inr <= 3.0) return {persenMin:0, persenMax:0, arah:0, teks:"Dosis tetap, tidak ada perubahan.", kontrol:"1 minggu", status:"safe", statusText:"Target terapeutik"};
+  if(inr <= 4.9) return {persenMin:5, persenMax:10, arah:-1, teks:"Turunkan dosis mingguan 5–10%.", kontrol:"2 minggu", status:"watch", statusText:"Supra-terapeutik"};
+  if(inr <= 5.0) return {persenMin:10, persenMax:20, arah:-1, teks:"Turunkan dosis mingguan 10–20%.", kontrol:"1 minggu", status:"danger", statusText:"Supra-terapeutik"};
+  return {persenMin:100, persenMax:100, arah:-1, stop:true, teks:"Hentikan pemberian warfarin. Pantau INR secara berkala sampai turun menjadi ≤3,0, lalu mulai kembali dengan dosis yang lebih rendah.", kontrol:"Pantau berkala hingga INR ≤3,0", status:"danger", statusText:"Kritis — Stop"};
+}
+
+function bagiDosisHarian(dosisMingguMg, tabletMg){
+  const halfUnit = tabletMg/2;
+  let totalHalfUnits = Math.round(dosisMingguMg/halfUnit);
+  if(totalHalfUnits < 0) totalHalfUnits = 0;
+  const base = Math.floor(totalHalfUnits/7);
+  const extra = totalHalfUnits % 7;
+  const hari = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
+  const unitsPerDay = [];
+  for(let i=0;i<7;i++){
+    const cur = Math.floor(((i+1)*extra)/7) - Math.floor((i*extra)/7);
+    unitsPerDay.push(base+cur);
+  }
+  return hari.map((nama,i)=>{
+    const mg = unitsPerDay[i]*halfUnit;
+    const tab = unitsPerDay[i]*0.5;
+    return {nama, mg, tab};
+  });
+}
+
+function hexToRgb(hex){
+  hex = hex.trim().replace('#','');
+  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const num = parseInt(hex,16);
+  return {r:(num>>16)&255, g:(num>>8)&255, b:num&255};
+}
+
+function warnaDosis(ratio){
+  const cs = getComputedStyle(document.documentElement);
+  const rendah = hexToRgb(cs.getPropertyValue('--paper') || '#F6F3EC');
+  const tinggi = hexToRgb(cs.getPropertyValue('--safe') || '#2F6F5E');
+  const r = Math.round(rendah.r + (tinggi.r-rendah.r)*ratio);
+  const g = Math.round(rendah.g + (tinggi.g-rendah.g)*ratio);
+  const b = Math.round(rendah.b + (tinggi.b-rendah.b)*ratio);
+  return `rgb(${r},${g},${b})`;
+}
+
+function fmt(n){
+  return (Math.round(n*100)/100).toString().replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+}
+
+let state = null;
+
+function hitung(){
+  const dosisEl = document.getElementById('dosisMingguan');
+  const inrEl = document.getElementById('inr');
+  const tabletMg = parseFloat(document.getElementById('tablet').value);
+  const dosisLamaMg = parseFloat(dosisEl.value);
+  const inr = parseFloat(inrEl.value);
+  const err = document.getElementById('err');
+
+  if(isNaN(dosisLamaMg) || dosisLamaMg <= 0 || isNaN(inr) || inr <= 0){
+    err.style.display='block';
+    document.getElementById('hasil').style.display='none';
+    return;
+  }
+  err.style.display='none';
+
+  const aturan = getAturan(inr);
+  const adaRentang = !aturan.stop && aturan.persenMin !== undefined && !(aturan.persenMin===0 && aturan.persenMax===0);
+
+  state = {dosisLamaMg, tabletMg, inr, aturan, adaRentang, pilihan:'tengah'};
+
+  document.getElementById('inrTampil').textContent = 'INR ' + fmt(inr);
+  document.getElementById('statusText').textContent = aturan.statusText;
+  document.getElementById('statusStrip').className = 'status-strip st-' + aturan.status;
+  document.getElementById('dosisLama').textContent = fmt(dosisLamaMg) + ' mg';
+
+  const segWrap = document.getElementById('pilihanPersen');
+  const seg = document.getElementById('segPersen');
+  if(adaRentang){
+    segWrap.style.display = 'block';
+    const opsi = [
+      {key:'terkecil', persen:aturan.persenMin, label:'Terkecil'},
+      {key:'tengah', persen:(aturan.persenMin+aturan.persenMax)/2, label:'Tengah'},
+      {key:'tertinggi', persen:aturan.persenMax, label:'Tertinggi'}
+    ];
+    seg.innerHTML = '';
+    opsi.forEach(o=>{
+      const div = document.createElement('div');
+      div.className = 'opt' + (o.key==='tengah' ? ' active' : '');
+      div.dataset.key = o.key;
+      div.innerHTML = '<div class="p">'+o.persen+'%</div><div class="l">'+o.label+'</div>';
+      div.onclick = ()=> pilihPersen(o.key);
+      seg.appendChild(div);
+    });
+  } else {
+    segWrap.style.display = 'none';
+  }
+
+  renderDosis();
+  document.getElementById('hasil').style.display = 'block';
+  document.getElementById('hasil').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function pilihPersen(key){
+  state.pilihan = key;
+  document.querySelectorAll('#segPersen .opt').forEach(el=>{
+    el.classList.toggle('active', el.dataset.key === key);
+  });
+  renderDosis();
+}
+
+function renderDosis(){
+  const {dosisLamaMg, tabletMg, aturan, adaRentang, pilihan} = state;
+  let dosisBaruMg, persenDipakai;
+
+  if(aturan.stop){
+    dosisBaruMg = 0;
+  } else if(!adaRentang){
+    dosisBaruMg = dosisLamaMg;
+  } else {
+    persenDipakai = pilihan==='terkecil' ? aturan.persenMin : pilihan==='tertinggi' ? aturan.persenMax : (aturan.persenMin+aturan.persenMax)/2;
+    dosisBaruMg = dosisLamaMg * (1 + aturan.arah * persenDipakai/100);
+  }
+
+  document.getElementById('dosisBaru').textContent = aturan.stop ? '0 mg' : fmt(dosisBaruMg) + ' mg';
+
+  let instruksi = aturan.teks;
+  if(adaRentang){
+    instruksi += ' Menggunakan penyesuaian ' + persenDipakai + '% (' + pilihan + ').';
+  }
+  document.getElementById('instruksiTeks').textContent = instruksi;
+
+  const grid = document.getElementById('pillGrid');
+  grid.innerHTML = '';
+  if(aturan.stop){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:13px;color:var(--danger);padding:10px 0;">Warfarin dihentikan — tidak ada dosis harian</div>';
+  } else {
+    const pembagian = bagiDosisHarian(dosisBaruMg, tabletMg);
+    const mgs = pembagian.map(h=>h.mg);
+    const mgMin = Math.min(...mgs), mgMax = Math.max(...mgs);
+    pembagian.forEach(h=>{
+      const ratio = mgMax > mgMin ? (h.mg - mgMin)/(mgMax - mgMin) : 0;
+      const div = document.createElement('div');
+      div.className = 'hari';
+      div.style.background = warnaDosis(ratio);
+      if(ratio > 0.55) div.classList.add('hari-gelap');
+      div.innerHTML = '<div class="d">'+h.nama.slice(0,3)+'</div><div class="mg">'+fmt(h.mg)+'</div><div class="tab">'+fmt(h.tab)+' tab</div>';
+      grid.appendChild(div);
+    });
+  }
+
+  document.getElementById('kontrolWaktu').textContent = aturan.kontrol;
+}
+</script>
+</body>
+</html>
