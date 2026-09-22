@@ -335,8 +335,8 @@
     card.className = 'result-card';
     const dose = (3.5 - albumin) * 0.8 * weight;
     const deficit = 3.5 - albumin;
-    const vials20 = Math.ceil(dose / 20); // 20% albumin: 50mL vial = 10g
-    const vials25 = Math.ceil(dose / 12.5); // 25% albumin: 50mL vial = 12.5g
+    const vials20 = Math.ceil(dose / 20); // 20% albumin: 100mL vial = 20g
+    const vials25 = Math.ceil(dose / 25); // 25% albumin: 100mL vial = 25g
 
     let severity = deficit < 1 ? 'Mild' : deficit < 1.5 ? 'Moderate' : 'Severe';
     let sevColor = deficit < 1 ? '#f0883e' : deficit < 1.5 ? '#f0883e' : '#f85149';
@@ -349,8 +349,8 @@
         Deficit: <span class="highlight">${deficit.toFixed(1)} g/dL</span> &nbsp;|&nbsp;
         Severity: <span style="color:${sevColor}">${severity}</span><br><br>
         Approx. vials needed:<br>
-        &bull; <b style="color:#58a6ff">20% albumin</b> (50 mL = 10 g): <b>${vials20} vials</b> (${(vials20*50).toFixed(0)} mL)<br>
-        &bull; <b style="color:#58a6ff">25% albumin</b> (50 mL = 12.5 g): <b>${vials25} vials</b> (${(vials25*50).toFixed(0)} mL)
+        &bull; <b style="color:#58a6ff">20% albumin</b> (100 mL = 20 g): <b>${vials20} vials</b> (${(vials20*100).toFixed(0)} mL)<br>
+        &bull; <b style="color:#58a6ff">25% albumin</b> (100 mL = 25 g): <b>${vials25} vials</b> (${(vials25*100).toFixed(0)} mL)
       </div>
     `;
   }
