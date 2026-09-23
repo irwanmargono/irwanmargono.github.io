@@ -159,6 +159,26 @@
       animation: dripPulse 1.6s ease-in-out infinite;
     }
 
+    /* ── Pulse animation for warfarin icon ── */
+    @keyframes pulseBeat {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.18); opacity: 0.75; }
+    }
+    .card.pulse .icon-wrap span {
+      display: inline-block;
+      animation: pulseBeat 1.5s ease-in-out infinite;
+    }
+
+    /* ── Coin flip animation for tax icon ── */
+    @keyframes coinFlip {
+      0%, 100% { transform: rotateY(0deg); }
+      50% { transform: rotateY(180deg); }
+    }
+    .card.coin .icon-wrap span {
+      display: inline-block;
+      animation: coinFlip 2.2s ease-in-out infinite;
+    }
+
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -389,7 +409,17 @@
       <div class="arrow">→</div>
     </a>
 
-    <a href="https://kalkulator.drsppd.com/kalkulator-pajak-dokter.html" target="_blank" rel="noopener" class="card">
+    <a href="https://kalkulator.drsppd.com/kalkulator-dosis-warfarin.html" target="_blank" rel="noopener" class="card" style="--c: var(--accent3);">
+      <div class="icon-wrap">💊</div>
+      <div class="card-body">
+        <div class="card-label">Kardiovaskular</div>
+        <div class="card-title">Kalkulator Dosis Warfarin</div>
+        <div class="card-desc">Estimasi dosis awal &amp; pemeliharaan warfarin</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a href="https://kalkulator.drsppd.com/kalkulator-pajak-dokter.html" target="_blank" rel="noopener" class="card" style="--c: var(--accent4);">
       <div class="icon-wrap">💰</div>
       <div class="card-body">
         <div class="card-label">Finansial</div>
