@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator Kecepatan SP NTG</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --text:#1a1d21; --muted:#6b7280;
+  --accent:#2563eb; --accent2:#0891b2; --border:#e2e8f0;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111418; --card:#1a1e24; --text:#eef1f4; --muted:#9aa4b2; --border:#2a2f37;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111418; --card:#1a1e24; --text:#eef1f4; --muted:#9aa4b2; --border:#2a2f37;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:20px 16px 32px;
+}
+.wrap{max-width:480px;margin:0 auto;}
+h1{font-size:1.25rem;margin:0 0 4px;}
+.sub{color:var(--muted);font-size:0.85rem;margin:0 0 20px;}
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:18px; margin-bottom:16px;
+}
+label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px;font-weight:600;}
+input{
+  width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border);
+  background:var(--bg); color:var(--text); font-size:1.05rem; outline:none;
+}
+input:focus{border-color:var(--accent);}
+.result{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 0; border-top:1px solid var(--border);
+}
+.result:first-of-type{border-top:none;}
+.result .label{font-size:0.9rem;color:var(--text);font-weight:500;}
+.result .desc{font-size:0.75rem;color:var(--muted);margin-top:2px;}
+.result .val{font-size:1.3rem;font-weight:700;white-space:nowrap;}
+.val.pure{color:var(--accent);}
+.val.dilute{color:var(--accent2);}
+.info{font-size:0.75rem;color:var(--muted);margin-top:10px;line-height:1.5;}
+footer{
+  text-align:center; margin-top:24px; font-size:0.8rem; color:var(--muted);
+}
+footer a{color:var(--accent);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Kalkulator Kecepatan SP NTG</h1>
+  <p class="sub">Sediaan ampul NTG 10 mg/10 mL</p>
+
+  <div class="card">
+    <label for="dose">Dosis (mcg/menit)</label>
+    <input id="dose" type="number" inputmode="decimal" placeholder="Contoh: 10" min="0" step="any">
+  </div>
+
+  <div class="card" id="resultCard">
+    <div class="result">
+      <div>
+        <div class="label">NTG Murni</div>
+        <div class="desc">langsung dari ampul (1.000 mcg/mL)</div>
+      </div>
+      <div class="val pure" id="resPure">– mL/jam</div>
+    </div>
+    <div class="result">
+      <div>
+        <div class="label">NTG Diencerkan</div>
+        <div class="desc">1 amp (10 mg) dalam 50 mL (200 mcg/mL)</div>
+      </div>
+      <div class="val dilute" id="resDilute">– mL/jam</div>
+    </div>
+    <div class="info">Hasil dalam mL/jam, sesuai satuan umum pada syringe pump.</div>
+  </div>
+
+  <footer><a href="https://kalkulator.drsppd.com">kalkulator.drsppd.com</a></footer>
+</div>
+
+<script>
+const CONC_PURE = 1000;   // mcg/mL (10 mg/10 mL)
+const CONC_DILUTE = 200;  // mcg/mL (10 mg / 50 mL)
+
+const doseInput = document.getElementById('dose');
+const resPure = document.getElementById('resPure');
+const resDilute = document.getElementById('resDilute');
+
+function fmt(n){
+  if(!isFinite(n)) return '–';
+  return n.toFixed(3).replace(/\.?0+$/,'') || '0';
+}
+
+function calc(){
+  const dose = parseFloat(doseInput.value);
+  if(isNaN(dose) || dose < 0){
+    resPure.textContent = '– mL/jam';
+    resDilute.textContent = '– mL/jam';
+    return;
+  }
+  const ratePure = (dose / CONC_PURE) * 60;
+  const rateDilute = (dose / CONC_DILUTE) * 60;
+  resPure.textContent = fmt(ratePure) + ' mL/jam';
+  resDilute.textContent = fmt(rateDilute) + ' mL/jam';
+}
+
+doseInput.addEventListener('input', calc);
+calc();
+</script>
+</body>
+</html>
