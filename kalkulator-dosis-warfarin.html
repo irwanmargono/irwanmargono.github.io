@@ -419,7 +419,7 @@ function getAturan(inr){
   if(inr < 1.5) return {persenMin:10, persenMax:20, arah:1, teks:"Naikkan dosis mingguan 10–20%.", kontrol:"1 minggu", status:"watch", statusText:"Sub-terapeutik"};
   if(inr <= 1.9) return {persenMin:5, persenMax:10, arah:1, teks:"Naikkan dosis mingguan 5–10%.", kontrol:"2 minggu", status:"watch", statusText:"Sub-terapeutik"};
   if(inr <= 3.0) return {persenMin:0, persenMax:0, arah:0, teks:"Dosis tetap, tidak ada perubahan.", kontrol:"1 minggu", status:"safe", statusText:"Target terapeutik"};
-  if(inr <= 4.9) return {persenMin:5, persenMax:10, arah:-1, teks:"Turunkan dosis mingguan 5–10%.", kontrol:"2 minggu", status:"watch", statusText:"Supra-terapeutik"};
+  if(inr <= 4.0) return {persenMin:5, persenMax:10, arah:-1, teks:"Turunkan dosis mingguan 5–10%.", kontrol:"2 minggu", status:"watch", statusText:"Supra-terapeutik"};
   if(inr <= 5.0) return {persenMin:10, persenMax:20, arah:-1, teks:"Turunkan dosis mingguan 10–20%.", kontrol:"1 minggu", status:"danger", statusText:"Supra-terapeutik"};
   return {persenMin:100, persenMax:100, arah:-1, stop:true, teks:"Hentikan pemberian warfarin. Pantau INR secara berkala sampai turun menjadi ≤3,0, lalu mulai kembali dengan dosis yang lebih rendah.", kontrol:"Pantau berkala hingga INR ≤3,0", status:"danger", statusText:"Kritis — Stop"};
 }
