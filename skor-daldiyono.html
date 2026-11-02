@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator Skor Daldiyono</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f7f8;--card:#fff;--ink:#14282e;--mut:#5c7279;--line:#d3e0e3;--acc:#0b6e78;--accbg:#dff1f3;--warn:#a4381f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b1e;--card:#172629;--ink:#e6f0f2;--mut:#93aab0;--line:#2a3f44;--acc:#5cc3cd;--accbg:#1d3a3f;--warn:#ff9c82}}
+:root[data-theme="dark"]{--bg:#0f1b1e;--card:#172629;--ink:#e6f0f2;--mut:#93aab0;--line:#2a3f44;--acc:#5cc3cd;--accbg:#1d3a3f;--warn:#ff9c82}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:1.35rem;margin:8px 0 2px}
+p.sub{margin:0 0 14px;color:var(--mut);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px 14px;margin-bottom:14px}
+label.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
+label.row:last-child{border-bottom:0}
+label.row span.t{flex:1}
+label.row b{min-width:28px;text-align:right;color:var(--mut);font-weight:600}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--acc)}
+h2{font-size:.95rem;margin:14px 0 4px;color:var(--mut);font-weight:600}
+.sel{padding:10px 0;display:flex;flex-direction:column;gap:6px}
+select,input[type=number]{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.res{background:var(--accbg);border:1px solid var(--acc);border-radius:10px;padding:14px;position:sticky;bottom:8px}
+.big{font-size:2rem;font-weight:700;color:var(--acc);line-height:1.1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.grid small{display:block;color:var(--mut)}
+.note{font-size:.82rem;color:var(--mut);margin:6px 0 0}
+.warn{color:var(--warn)}
+button{font:inherit;padding:8px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;cursor:pointer;margin-top:8px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Kalkulator Skor Daldiyono</h1>
+<p class="sub">Estimasi kebutuhan cairan pada dehidrasi (diare akut) berdasarkan klinis.</p>
+
+<div class="card" id="items"></div>
+
+<h2>Umur</h2>
+<div class="card"><div class="sel">
+<select id="age" aria-label="Umur">
+<option value="0">&lt;50 tahun (0)</option>
+<option value="-1">50–60 tahun (−1)</option>
+<option value="-2">&gt;60 tahun (−2)</option>
+</select></div></div>
+
+<h2>Berat badan</h2>
+<div class="card"><div class="sel">
+<input type="number" id="bw" min="1" max="300" step="0.1" inputmode="decimal" placeholder="Kg BB">
+</div></div>
+
+<h2>Durasi pemberian (jam)</h2>
+<div class="card"><div class="sel">
+<input type="number" id="dur" min="0.5" max="48" step="0.5" value="2" inputmode="decimal">
+</div></div>
+
+<div class="res" aria-live="polite">
+<div class="grid">
+<div><small>Total skor</small><span class="big" id="score">0</span></div>
+<div><small>Kebutuhan cairan</small><span class="big" id="vol">–</span></div>
+</div>
+<div id="extra" class="note"></div>
+<p class="note">Rumus: Skor/15 × 10% × kgBB × 1 liter. Dianjurkan diberikan dalam 2 jam pertama, lalu evaluasi ulang klinis dan sesuaikan dengan pengeluaran cairan berlanjut.</p>
+<button id="reset" type="button">Reset</button>
+</div>
+<h2>Rumus dan proses perhitungan</h2>
+<div class="card" id="steps" style="padding:12px 14px;font-size:.92rem"></div>
+</main>
+<script>
+var items=[["Rasa haus/muntah",1],["Tekanan darah sistolik 60–90 mmHg",1,"sbp"],["Tekanan darah sistolik <60 mmHg",2,"sbp"],["Frekuensi nadi >120x/menit",1],["Kesadaran apatis",1,"ks"],["Kesadaran somnolen, spoor atau koma",2,"ks"],["Frekuensi napas >30x/menit",1],["Fasies kolerika",2],["Vox kolerika",2],["Turgor kulit menurun",1],["Washer's woman hand",1],["Ekstremitas dingin",1],["Sianosis",2]];
+var box=document.getElementById("items");
+items.forEach(function(it,i){
+  var l=document.createElement("label");l.className="row";
+  l.innerHTML='<input type="checkbox" data-i="'+i+'" data-g="'+(it[2]||"")+'"><span class="t">'+it[0]+'</span><b>'+it[1]+'</b>';
+  box.appendChild(l);
+});
+var cbs=box.querySelectorAll("input");
+function calc(){try{calc0()}finally{steps()}}
+function steps(){
+  var f=function(x,n){return x.toFixed(n).replace(".",",")};
+  var parts=[],s=0;
+  cbs.forEach(function(c){if(c.checked){var p=items[c.dataset.i][1];s+=p;parts.push(p)}});
+  var a=parseInt(document.getElementById("age").value,10);s+=a;if(a)parts.push(a);
+  var bw=parseFloat(document.getElementById("bw").value),d=parseFloat(document.getElementById("dur").value);
+  var h='<p style="margin:0 0 8px"><b>Rumus</b><br>Kebutuhan cairan = Skor/15 × 10% × kgBB × 1 liter<br>tpm = (mL × 20) / (durasi jam × 60)<br>Tetes/detik = tpm / 60</p><p style="margin:0 0 4px"><b>Proses</b></p>';
+  h+='<p style="margin:0 0 6px">1. Skor = '+(parts.length?parts.map(function(p,i){return i&&p>=0?"+ "+p:(p<0?(i?"− ":"−")+Math.abs(p):p)}).join(" "):"0")+' = <b>'+s+'</b></p>';
+  if(s<=0||!bw){h+='<p class="note" style="margin:0">'+(s<=0?"Skor ≤ 0, perhitungan cairan tidak dilanjutkan.":"Isi berat badan untuk melanjutkan perhitungan.")+'</p>';document.getElementById("steps").innerHTML=h;return}
+  var L=s/15*0.1*bw,ml=Math.round(L*1000);
+  h+='<p style="margin:0 0 6px">2. Cairan = '+s+'/15 × 10% × '+f(bw,bw%1?1:0)+' kg × 1 L = '+f(L,2)+' L ≈ <b>'+ml+' mL</b></p>';
+  if(d>0){var tpm=ml*20/(d*60),tps=tpm/60;
+  h+='<p style="margin:0 0 6px">3. tpm = ('+ml+' × 20) / ('+f(d,d%1?1:0)+' × 60) = '+f(tpm,1)+' ≈ <b>'+Math.round(tpm)+' tpm</b></p>';
+  h+='<p style="margin:0">4. Tetes/detik = '+f(tpm,1)+' / 60 = <b>'+f(tps,2)+'</b> → 1 tetes tiap '+f(1/tps,2)+' detik</p>'}
+  document.getElementById("steps").innerHTML=h;
+}
+function calc0(){
+  var s=0;cbs.forEach(function(c){if(c.checked)s+=items[c.dataset.i][1]});
+  s+=parseInt(document.getElementById("age").value,10);
+  var bw=parseFloat(document.getElementById("bw").value);
+  document.getElementById("score").textContent=s;
+  var v=document.getElementById("vol"),ex=document.getElementById("extra");
+  if(s<=0||!bw){v.textContent="–";ex.textContent=s<0?"Skor ≤ 0: tidak ada indikasi rehidrasi berdasarkan skor.":"";return}
+  var L=s/15*0.1*bw;
+  v.textContent=L.toFixed(2).replace(".",",")+" L";
+  var d=parseFloat(document.getElementById("dur").value);
+  var ml=Math.round(L*1000),h=ex.innerHTML=ml+" mL";
+  if(!d||d<=0)return;
+  var tpm=ml*20/(d*60),tps=tpm/60;
+  var f=function(x,n){return x.toFixed(n).replace(".",",")};
+  ex.innerHTML='<b style="color:var(--ink)">'+ml+' mL dalam '+f(d,d%1?1:0)+' jam</b><br>'
+   +'<b style="color:var(--ink)">'+Math.round(tpm)+' tpm</b> (makro, 20 tetes = 1 mL)<br>'
+   +f(tps,2)+' tetes/detik · 1 tetes tiap '+f(1/tps,2)+' detik';
+}
+cbs.forEach(function(c){c.addEventListener("change",function(){
+  if(c.checked&&c.dataset.g)cbs.forEach(function(o){if(o!==c&&o.dataset.g===c.dataset.g)o.checked=false});
+  calc()})});
+document.getElementById("age").addEventListener("change",calc);
+document.getElementById("bw").addEventListener("input",calc);
+document.getElementById("dur").addEventListener("input",calc);
+document.getElementById("reset").addEventListener("click",function(){cbs.forEach(function(c){c.checked=false});document.getElementById("age").value="0";document.getElementById("bw").value="";document.getElementById("dur").value="2";calc()});
+calc();
+</script>
+</body>
+</html>
